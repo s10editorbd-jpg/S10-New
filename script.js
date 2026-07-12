@@ -534,9 +534,20 @@ container.innerHTML = `
         const feedback = String(item["Feedback from (TL/Senior)"] || "").trim();
         const chatLink = String(item["Chat link"] || "").trim();
         const screenshotLink = String(item["Screenshot link"] || "").trim();
+const reported =
+    String(item["Reported in file"] || "").trim().toUpperCase();
 
+const reportClass =
+    reported === "TRUE"
+        ? "reported-true"
+        : "reported-false";
+
+const feedbackClass =
+    feedback
+        ? ""
+        : "feedback-empty";
         return `
-            <div class="mistake-card ${colorClass}">
+            <div class="mistake-card ${colorClass} ${reportClass}">
 
                 <p class="cs-name">
                     👤 <strong>${item["CS Name"] || "-"}</strong>
@@ -554,7 +565,7 @@ container.innerHTML = `
 
                 </div>
 
-                <p class="remarks">
+                <p class="remarks ${feedbackClass}">
                     <strong>Mon REMARKS:</strong><br>
                     ${item["Detailed Remark"] || "-"}
                 </p>
