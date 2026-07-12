@@ -1,7 +1,7 @@
 // ==============================
 // Google Apps Script Web App URL
 // ==============================
-const BASE_URL = "https://script.google.com/macros/s/AKfycbws3ctzATrfPpo_UdSFVrrXg_hgmSCk0KcFvXM6U54A_3mMgbd3v8VbHreQmQW6LrGX/exec";
+const BASE_URL = "https://script.google.com/macros/s/AKfycbyC5rdp1PcQjPkPn178P6GjADymj7izjCRTcjjf8YgNljvGbc5zIalqnTfahS9hEjyl/exec";
 
 // ==============================
 // Global Variables
@@ -469,8 +469,13 @@ const notCounted = mistakes.length - trueCount;
     mistakes.sort((a, b) => {
         const dateA = parseDate(a["Date"]) || new Date(0);
         const dateB = parseDate(b["Date"]) || new Date(0);
+            if (dateB - dateA !== 0) {
         return dateB - dateA;
-    });
+    }
+
+    // একই তারিখ হলে, বড় Row আগে
+    return b.Row - a.Row;
+});
 
     // Header
 container.innerHTML = `
@@ -625,7 +630,5 @@ function renderLinks(category, containerId) {
             `;
         });
 }
-
-
 
 
