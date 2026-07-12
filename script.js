@@ -1,7 +1,7 @@
 // ==============================
 // Google Apps Script Web App URL
 // ==============================
-const BASE_URL = "https://script.google.com/macros/s/AKfycbwBWAFmY2rwd28vWk0GtjEFPlQnE2j22TEXAUy0BNAw1HJaLSL4x8MR32bHRAP40lTj/exec";
+const BASE_URL = "https://script.google.com/macros/s/AKfycbws3ctzATrfPpo_UdSFVrrXg_hgmSCk0KcFvXM6U54A_3mMgbd3v8VbHreQmQW6LrGX/exec";
 
 // ==============================
 // Global Variables
@@ -9,7 +9,7 @@ const BASE_URL = "https://script.google.com/macros/s/AKfycbwBWAFmY2rwd28vWk0GtjE
 let employees = [];
 let filteredEmployees = [];
 let allData = [];
-let allDataR = [];
+let Report = [];
 let allLinks = [];
 let dataReady = false;
 
@@ -64,56 +64,67 @@ function waitForDataAndRender(name) {
 // ==============================
 // LOAD DATA
 // ==============================
+
 document.addEventListener("DOMContentLoaded", () => {
-
-  Promise.all([
-updateDashboardStats();
-    fetch(BASE_URL + "?type=employee").then(r => r.json()),
-    fetch(BASE_URL + "?type=links").then(r => r.json()),
-    fetch(BASE_URL + "?type=mistake").then(r => r.json()),
-    fetch(BASE_URL + "?type=report").then(r => r.json())
-])
-.then(([employeeData, linksData, mistakeData, rportData]) => {
-
-    employees = employeeData || [];
-    filteredEmployees = employeeData || [];
-
-    allLinks = linksData || [];
-
-    allData = Array.isArray(mistakeData) ? mistakeData : [];
-
-    allDataR = Array.isArray(rportData) ? rportData : [];
-
-
-    console.log("Mistake Details Data:", allData);
-    console.log("Mistake Details R Data:", allDataR);
-    console.log("R Count:", allDataR.length);
-
-
-    renderLinks("BO","boLinks");
-    renderLinks("Deposit PLY","depositPlyLinks");
-    renderLinks("Deposit Sheet","depositSheetLinks");
-    renderLinks("SOP","sopLinks");
-    renderLinks("Sports BO","sportsBoLinks");
-    renderLinks("Sports","sportsGameLinks");
-    renderLinks("Other","otherLinks");
-
-
-    dataReady = true;
-
-
-    if (employees.length > 0) {
-        renderMistakes("");
-    }
-
-})
-
-    .catch(err => {
-        console.error("DATA LOAD ERROR:", err);
-        alert("Unable to load Data");
-    });
-
+    loadData();
 });
+
+  let firstLoad = true;
+
+function loadData() {
+
+    Promise.all([
+        fetch(BASE_URL + "?type=employee").then(r => r.json()),
+        fetch(BASE_URL + "?type=links").then(r => r.json()),
+        fetch(BASE_URL + "?type=mistake").then(r => r.json()),
+        fetch(BASE_URL + "?type=report").then(r => r.json())
+    ])
+    .then(([employeeData, linksData, mistakeData, reportData]) => {
+
+        employees = employeeData || [];
+        filteredEmployees = employeeData || [];
+        allLinks = linksData || [];
+        allData = Array.isArray(mistakeData) ? mistakeData : [];
+        Report = Array.isArray(reportData) ? reportData : [];
+
+        // শুধু প্রথমবার Link Render হবে
+        if (firstLoad) {
+
+            renderLinks("BO","boLinks");
+            renderLinks("Deposit PLY","depositPlyLinks");
+            renderLinks("Deposit Sheet","depositSheetLinks");
+            renderLinks("SOP","sopLinks");
+            renderLinks("Sports BO","sportsBoLinks");
+            renderLinks("Sports","sportsGameLinks");
+            renderLinks("Other","otherLinks");
+
+            if (employees.length > 0) {
+                showEmployeeByObject(employees[0]);
+            }
+
+            firstLoad = false;
+        }
+
+        // যদি কোনো CS Select থাকে
+        const empName = document.getElementById("empName")?.innerText;
+
+        if (empName && empName !== "Select Employee") {
+            renderMistakes(empName);
+        }
+
+        // Report Page Auto Refresh
+        if (document.getElementById("reportPage").style.display !== "none") {
+            renderAllMistakes();
+        }
+
+    })
+    .catch(console.error);
+}
+
+document.addEventListener("DOMContentLoaded", loadData);
+
+// প্রতি ১০ সেকেন্ডে নতুন Data Load
+setInterval(loadData, 10000);
 
 // ==============================
 // EMPLOYEE LIST
@@ -345,7 +356,7 @@ container.innerHTML = `
 </div>
 `;
 
-    const mistakes = allData.filter(item => {
+    const mistakes = Report.filter(item => {
 
         const itemName = String(item["CS Name"] || "")
             .trim()
@@ -447,6 +458,13 @@ function renderAllMistakes() {
     // সব রিপোর্ট নাও
     let mistakes = [...allData];
 
+// True / False Count
+const trueCount = mistakes.filter(item =>
+    String(item["Reported in file"] || "").trim().toUpperCase() === "TRUE"
+).length;
+
+const notCounted = mistakes.length - trueCount;
+
     // নতুন থেকে পুরাতন সাজাও
     mistakes.sort((a, b) => {
         const dateA = parseDate(a["Date"]) || new Date(0);
@@ -455,19 +473,31 @@ function renderAllMistakes() {
     });
 
     // Header
-    container.innerHTML = `
-        <div class="mistake-header">
+container.innerHTML = `
+<div class="mistake-header">
 
-            <div>
-                <h2>All Mistakes Reports</h2>
-            </div>
+    <div>
+        <h2>All Mistakes Reports</h2>
+    </div>
 
-            <div class="count-badge">
-                📊 ${mistakes.length} Reports
-            </div>
+    <div style="display:flex;gap:10px;align-items:center;">
 
+        <div class="count-badge">
+            📊 ${mistakes.length} Reports
         </div>
-    `;
+
+        <div class="count-badge success">
+           🔴 ${trueCount} Counted
+        </div>
+
+        <div class="count-badge danger">
+            🟢 ${notCounted} Not Counted
+        </div>
+
+    </div>
+
+</div>
+`;
 
     if (!mistakes.length) {
         container.innerHTML += `
@@ -560,7 +590,7 @@ function renderAllMistakes() {
 
     }).join("");
 
-    container.innerHTML += html;
+container.insertAdjacentHTML("beforeend", html);
 
     container.innerHTML += `
         <div class="end-list">
@@ -595,53 +625,7 @@ function renderLinks(category, containerId) {
             `;
         });
 }
-// ==============================
-// new
-// ==============================
 
-function updateDashboardStats(){
 
-    document.getElementById("totalCS").innerText =
-        employees.length;
 
-    document.getElementById("totalMistakes").innerText =
-        allData.length;
 
-    const currentMonth = getRunningMonth();
-
-    const monthCount = allData.filter(item => {
-
-        const d = parseDate(item["Date"]);
-        if(!d) return false;
-
-        const m = d.toLocaleString("default",{
-            month:"long",
-            year:"numeric"
-        });
-
-        return m === currentMonth;
-
-    }).length;
-
-    document.getElementById("monthMistakes").innerText =
-        monthCount;
-
-    const mistakeNames = new Set(
-        allData.map(x => x["CS Name"])
-    );
-
-    document.getElementById("zeroMistake").innerText =
-        employees.length - mistakeNames.size;
-}
-
-/* Dark Mode */
-
-document.addEventListener("click",function(e){
-
-    if(e.target.id === "darkModeBtn"){
-
-        document.body.classList.toggle("dark");
-
-    }
-
-});
