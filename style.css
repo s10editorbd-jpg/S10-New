@@ -887,3 +887,23 @@ body{
     background:#22c55e;
     color:#fff;
 }
+
+/* Reported TRUE */
+.reported-true{
+    background:#f4d0d0;
+    border-left:6px solid #22c55e;
+}
+
+/* Reported FALSE */
+.reported-false{
+    background:#a5e8c8;
+    border-left:6px solid #ef4444;
+}
+
+/* Feedback Empty */
+.feedback-empty{
+    background:#fff8dc;
+    border:1px solid #f4d35e;
+    padding:12px;
+    border-radius:10px;
+}
