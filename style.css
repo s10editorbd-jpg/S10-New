@@ -675,7 +675,7 @@ body{
 
 /* Wrong Information */
 .mistake-card.wrong-information{
-    border-left-color:#ff151f;
+    border-left-color:#a889d2;
 }
 
 .subject.wrong-information,
@@ -686,7 +686,7 @@ body{
 
 /* Not Follow SOP */
 .mistake-card.not-follow-sop{
-    border-left-color:#e3686d;
+    border-left-color:#a889d2;
 }
 
 .subject.not-follow-sop,
@@ -697,7 +697,7 @@ body{
 
 /* Late Reply */
 .mistake-card.late-reply{
-    border-left-color:#febabd;
+    border-left-color:#a889d2;
 }
 
 .subject.late-reply,
@@ -719,7 +719,7 @@ body{
 
 /* Angry With Player */
 .mistake-card.angry-player{
-    border-left-color:#e3056a;
+    border-left-color:#a889d2;
 }
 
 .subject.angry-player,
@@ -730,7 +730,7 @@ body{
 
 /* Non Professional*/
 .mistake-card.non-professional{
-    border-left-color:#ff151f;
+    border-left-color:#a889d2;
 }
 
 .subject.non-professional,
@@ -741,7 +741,7 @@ body{
 
 /* No solution */
 .mistake-card.no-solution{
-    border-left-color:#e3686d;
+    border-left-color:#a889d2;
 }
 
 .subject.no-solution,
@@ -752,7 +752,7 @@ body{
 
 /* No explanation */
 .mistake-card.no-explanation{
-    border-left-color:#febabd;
+    border-left-color:#a889d2;
 }
 
 .subject.no-explanation,
@@ -774,7 +774,7 @@ body{
 
 /* Warning letter*/
 .mistake-card.warning-letter{
-    border-left-color:#e3056a;
+    border-left-color:#a889d2;
 }
 
 .subject.warning-letter,
