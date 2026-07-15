@@ -91,6 +91,8 @@ function loadData() {
         if (firstLoad) {
 
             renderLinks("BO","boLinks");
+            renderLinks("Website Link","wbLinks");
+            renderLinks("Chat Link","ctLinks");
             renderLinks("Deposit PLY","depositPlyLinks");
             renderLinks("Deposit Sheet","depositSheetLinks");
             renderLinks("SOP","sopLinks");
@@ -297,7 +299,7 @@ function setBrand(id, value) {
 // ==============================
 function showPage(page, element) {
 
-    ["employeePage", "reportPage", "linksPage", "depositPage", "SOPPage", "SportsPage", "OtherPage"]
+    ["employeePage", "reportPage", "linksPage", "WebsitePage", "depositPage", "SOPPage", "SportsPage", "OtherPage"]
         .forEach(id => {
             const el = document.getElementById(id);
             if (el) el.style.display = "none";
