@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>S10 Welcome</title>
+   <b> <title>10 Welcome</title> </b>
     <link rel="icon" type="image/png"
         href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFqhBaNVK_GbQaJqJVUa0Y2succ7kactyGor7iYzggYQ&s">
      <link rel="stylesheet" href="style.css">
@@ -22,17 +22,20 @@
 
 <body>
 
+<script>
+    // Check Login
+    const user = localStorage.getItem("user");
+
+    if (!user) {
+        window.location.replace("login.html");
+    }
+</script>
+
      <div class="container">
 
     <div class="sidebar">
 
-        <div class="logo">
-
-            <i class="fa-solid fa-users"></i>
-
-            <h2>S10 Portal</h2>
-
-        </div>
+<div class="logo"> <i class="fa-solid fa-users"></i> <h2>S10 Portal</h2> </div>
 
         <div class="menu">
 
@@ -74,6 +77,11 @@
 <div class="menu-item" onclick="showPage('Other',this)"> 
     <i class="fa-solid fa-folder-open"></i> 
       Important Sheet 
+</div>
+
+<div class="menu-item" onclick="logout()">
+    <i class="fa-solid fa-right-from-bracket"></i>
+    Logout
 </div>
 
         </div>
@@ -253,11 +261,9 @@
     <div class="profile-card FN">
 
         <h2>Deposit PLY</h2>
-        <br>
         <div id="depositPlyLinks" class="brand-grid"></div>
 
         <h2 style="margin-top:30px;">Deposit Sheets</h2>
-        <br>
         <div id="depositSheetLinks" class="brand-grid"></div>
 
     </div>
@@ -323,7 +329,23 @@
 </div> 
 </div> 
 
+<script>
+function logout(){
+
+    if(confirm("Are you sure you want to logout?")){
+
+        localStorage.removeItem("user");
+        localStorage.removeItem("role");
+
+        window.location.replace("login.html");
+    }
+
+}
+</script>
+
 <script src="script.js"></script>
+
+
 
 </body>
 </html>
