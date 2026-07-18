@@ -447,7 +447,10 @@ body{
 .BetJDB{background:#c9883c;}
 .BN88{background:#689F38;}
 .BDVegas{background:#470478;}
-.CPC88{background:#146067;}
+.CPC88
+{background:#2ec5d3;
+color:#ffff00;
+}
 .Deshi777{background:#8E24AA;}
 .BetVisa{background:#0288D1;}
 .Wicket{background:#ff871a;}
