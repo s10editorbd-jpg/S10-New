@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S10 Portal Login</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Poppins',sans-serif;
+        }
+
+        body{
+
+            background:#f4f6fb;
+
+            display:flex;
+
+            justify-content:center;
+
+            align-items:center;
+
+            height:100vh;
+
+        }
+
+        .login-box{
+
+            width:380px;
+
+            background:#fff;
+
+            padding:35px;
+
+            border-radius:12px;
+
+            box-shadow:0 10px 25px rgba(0,0,0,.15);
+
+        }
+
+        h2{
+
+            text-align:center;
+
+            margin-bottom:25px;
+
+            color:#222;
+
+        }
+
+        input{
+
+            width:100%;
+
+            padding:12px;
+
+            margin-bottom:15px;
+
+            border:1px solid #ddd;
+
+            border-radius:8px;
+
+            outline:none;
+
+            font-size:15px;
+
+        }
+
+        button{
+
+            width:100%;
+
+            padding:12px;
+
+            border:none;
+
+            border-radius:8px;
+
+            background:#16a34a;
+
+            color:#fff;
+
+            font-size:16px;
+
+            cursor:pointer;
+
+        }
+
+        button:hover{
+
+            background:#15803d;
+
+        }
+
+        #msg{
+
+            margin-top:15px;
+
+            text-align:center;
+
+            color:red;
+
+            font-size:14px;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="login-box">
+
+<h2>S10 Portal Login</h2>
+
+<input type="text" id="username" placeholder="Username">
+
+<input type="password" id="password" placeholder="Password">
+
+<button id="loginBtn" onclick="login()">
+Login
+</button>
+
+<p id="msg"></p>
+
+</div>
+
+<script>
+
+const API="https://script.google.com/macros/s/AKfycbx-wNqwK7Ag1bjM2G3Yg1cwiDG45uR7R4d7NGBN2Kmb0SskZJZA-jLIUy3RbaXwbm4H/exec";
+
+if(localStorage.getItem("user")){
+
+    window.location.href="index.html";
+
+}
+
+document.addEventListener("keypress",function(e){
+
+    if(e.key==="Enter"){
+
+        login();
+
+    }
+
+});
+
+function login(){
+
+    let username=document.getElementById("username").value.trim();
+
+    let password=document.getElementById("password").value.trim();
+
+    let msg=document.getElementById("msg");
+
+    let btn=document.getElementById("loginBtn");
+
+    msg.innerHTML="";
+
+    if(username==="" || password===""){
+
+        msg.innerHTML="Please enter Username and Password";
+
+        return;
+
+    }
+
+    btn.innerHTML="Checking...";
+
+    btn.disabled=true;
+
+    fetch(API,{
+
+        method:"POST",
+
+        headers:{
+
+            "Content-Type":"text/plain;charset=utf-8"
+
+        },
+
+        body:JSON.stringify({
+
+            action:"login",
+
+            username:username,
+
+            password:password
+
+        })
+
+    })
+
+    .then(res=>res.json())
+
+    .then(data=>{
+
+        btn.innerHTML="Login";
+
+        btn.disabled=false;
+
+        if(data.success){
+
+            localStorage.setItem("user",data.username);
+
+            localStorage.setItem("role",data.role);
+
+            window.location.href="index.html";
+
+        }else{
+
+            msg.innerHTML=data.message;
+
+        }
+
+    })
+
+.catch(err=>{
+
+    btn.innerHTML="Login";
+    btn.disabled=false;
+
+    msg.innerHTML = 
+    "Error: " + err.message;
+
+    console.log("LOGIN ERROR:", err);
+
+});
+
+}
+
+</script>
+
+</body>
+
+</html>
