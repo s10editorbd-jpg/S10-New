@@ -1,7 +1,7 @@
 // ==============================
 // Google Apps Script Web App URL
 // ==============================
-const BASE_URL = "https://script.google.com/macros/s/AKfycbyC5rdp1PcQjPkPn178P6GjADymj7izjCRTcjjf8YgNljvGbc5zIalqnTfahS9hEjyl/exec";
+const BASE_URL = "https://script.google.com/macros/s/AKfycbx-wNqwK7Ag1bjM2G3Yg1cwiDG45uR7R4d7NGBN2Kmb0SskZJZA-jLIUy3RbaXwbm4H/exec";
 
 // ==============================
 // Global Variables
@@ -123,7 +123,7 @@ function loadData() {
     .catch(console.error);
 }
 
-document.addEventListener("DOMContentLoaded", loadData);
+
 
 // প্রতি ১০ সেকেন্ডে নতুন Data Load
 setInterval(loadData, 10000);
@@ -644,4 +644,13 @@ function renderLinks(category, containerId) {
         });
 }
 
+function logout(){
 
+    if(confirm("Are you sure you want to logout?")){
+
+        localStorage.removeItem("user");
+        window.location.href="login.html";
+
+    }
+
+}
