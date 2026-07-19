@@ -230,6 +230,7 @@ function showEmployeeByObject(emp, showrport = true) {
     setText("teamid", emp["STAFF MS Team ID"]);
     setText("agent", emp["ICX Agent"]);
     setText("group", emp["Group"]);
+    setText("mistake", emp["Mistake"]);
 
     const search = document.getElementById("search");
     if (search) search.value = emp["CS Name"] || "";
