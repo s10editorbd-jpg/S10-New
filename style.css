@@ -10,7 +10,7 @@
 }
 
 body{
-    background:#eef3fb;
+    background:#001d4b;
 }
 
 /* ================= Layout ================= */
@@ -24,13 +24,36 @@ body{
 
 .sidebar{
     width:300px;
-    background:#16469d;
     color:#fff;
     display:flex;
     flex-direction:column;
     padding:20px;
     overflow-y:auto;
+    background: linear-gradient(
+        to bottom,
+        #00c6ff,
+        #2946a4,
+        #6a11cb,
+        #f505a4,
+        #00c6ff,
+        #00c6ff
+    );
+
+    background-size: 400% 400%;
+    animation: gradientMove 30s ease infinite;
 }
+
+@keyframes gradientMove{
+    0%{
+        background-position: 0% 0%;
+    }
+    50%{
+        background-position: 100% 100%;
+    }
+    100%{
+        background-position: 0% 0%;
+    }}
+
 
 .logo{
     display:flex;
@@ -76,13 +99,56 @@ body{
 
 .menu-item:hover{
 
-    background:#1565c0;
+    background: linear-gradient(
+        to left,
+        #e8b7b7,
+        #d70c0c,
+        #05f548,
+        #e8b7b7
+    );
+
+    background-size: 400% 400%;
+    animation: gradientMove 4s ease infinite;
+}
+
+@keyframes gradientMove{
+    0%{
+        background-position: 0% 0%;
+    }
+    50%{
+        background-position: 100% 100%;
+    }
+    100%{
+        background-position: 0% 0%;
+    }
+
 
 }
 
 .menu-item.active{
 
-    background:#08367e;
+        background: linear-gradient(
+        to left,
+        #e8b7b7,
+        #d70c0c,
+        #05f548,
+        #e8b7b7
+    );
+
+    background-size: 400% 400%;
+    animation: gradientMove 30s ease infinite;
+}
+
+@keyframes gradientMove{
+    0%{
+        background-position: 0% 0%;
+    }
+    50%{
+        background-position: 100% 100%;
+    }
+    100%{
+        background-position: 0% 0%;
+    }
 
 }
 
@@ -207,7 +273,7 @@ body{
 
 .topbar h1{
 
-    color:#0d47a1;
+    color:#fff;
 
     font-size:30px;
 
@@ -247,7 +313,7 @@ body{
 
     border-radius:50%;
 
-    background:#0d47a1;
+    background:#0064ff;
 
     color:#fff;
 
@@ -271,7 +337,7 @@ body{
 
 .profile-header p{
 
-    color:#777;
+    color:#023483;
 
 }
 
@@ -290,11 +356,11 @@ body{
 
 .box{
 
-    background:#f7f9fc;
+    background:#e7e6e6;
 
     border-left:5px solid #0d47a1;
 
-    border-radius:15px;
+    border-radius:15px ;
 
     padding:18px;
 
@@ -302,9 +368,9 @@ body{
 
 .box span{
 
-    color:#777;
+    color:#fe0000;
 
-    font-size:13px;
+    font-size:17px;
 
 }
 
@@ -318,11 +384,12 @@ body{
 
 }
 
+
 /* ================= Brand ================= */
 
 .title{
 
-    color:#0d47a1;
+    color:#000;
 
     margin-bottom:15px;
 
@@ -396,7 +463,36 @@ body{
 
     border:2px solid #15c54a;
 
-    background:#edfff2;
+    background: linear-gradient(
+        to top,
+        
+        #ffffff,
+        #c0ede6,
+        #ffffff,
+        #c0ede6,
+        #ffffff,
+        #c0ede6,
+        #ffffff,
+        #c0ede6,
+        #ffffff,
+        #c0ede6,
+        #ffffff
+    );
+
+    background-size: 200% 200%;
+    animation: gradientMove 60s ease infinite;
+}
+
+@keyframes gradientMove{
+    0%{
+        background-position: 0% 0%;
+    }
+    50%{
+        background-position: 100% 100%;
+    }
+    100%{
+        background-position: 0% 0%;
+    }
 
 }
 
@@ -433,7 +529,7 @@ body{
 }
 
 /* Colors */
-.FN{background:#c1e5e7;}
+.FN{background:#b3f5fd;}
 .GEINE{background:#1976D2;}
 .Super{background:#cf0067;}
 .Extension{background:#0620f2;}
@@ -894,7 +990,7 @@ color:#ffff00;
 /* Reported TRUE */
 .reported-true{
     background:#f4d0d0;
-    border-left:6px solid #22c55e;
+    border-left:6px solid #a889d2;
 }
 
 /* Reported FALSE */
@@ -909,4 +1005,15 @@ color:#ffff00;
     border:1px solid #f4d35e;
     padding:12px;
     border-radius:10px;
+}
+
+
+
+.serial-badge{
+    background:#10b981;
+    color:#fff;
+    padding:4px 10px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:700;
 }
