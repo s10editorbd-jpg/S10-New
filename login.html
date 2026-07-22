@@ -5,8 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>S10 Portal Login</title>
-
-    <link rel="icon" type="image/png"
+<link rel="icon" type="image/png"
         href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFqhBaNVK_GbQaJqJVUa0Y2succ7kactyGor7iYzggYQ&s">
      <link rel="stylesheet" href="style.css">
 
@@ -21,25 +20,44 @@
             font-family:'Poppins',sans-serif;
         }
 
-        body{
+body{
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-            background:#f4f6fb;
+    background: radial-gradient(circle,
+        #00c6ff,
+        #2946a4,
+        #6a11cb,
+        #18df1e,
+        #2946a4,
+        #00c6ff,
+        #df1818
+    );
 
-            display:flex;
+    background-size: 1000% 1000%;
+    animation: gradientMove 60s ease infinite;
+}
 
-            justify-content:center;
-
-            align-items:center;
-
-            height:100vh;
-
-        }
+@keyframes gradientMove{
+    0%{
+        background-position: 0% 0%;
+    }
+    50%{
+        background-position: 100% 100%;
+    }
+    100%{
+        background-position: 0% 0%;
+    }
+}
 
         .login-box{
 
             width:380px;
 
-            background:#fff;
+            background:radial-gradient(circle, #2946a4, #00c6ff, #00c6ff, #ffffff);
 
             padding:35px;
 
@@ -53,9 +71,9 @@
 
             text-align:center;
 
-            margin-bottom:25px;
+            margin-bottom:30px;
 
-            color:#222;
+            color:#00000;
 
         }
 
@@ -99,7 +117,7 @@
 
         button:hover{
 
-            background:#15803d;
+            background:#d10a0a;
 
         }
 
