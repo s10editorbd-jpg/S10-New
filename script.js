@@ -413,14 +413,14 @@ container.innerHTML += mistakes.map(item => {
             <span class="subject ${colorClass}">
                 ${item["Subject"]}
             </span>
-
+    <div style="display:flex;align-items:center;gap:8px;">
         <span class="count-badge">
             @${index + 1}
         </span>
             <span class="date ${colorClass}">
                 📅 ${date ? date.toLocaleDateString("en-GB") : "-"}
             </span>
-
+</div>
         </div>
 
         <p class="remarks">
