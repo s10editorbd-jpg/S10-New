@@ -6,7 +6,7 @@
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:'Poppins',sans-serif;
+    font-family:'Space Grotesk',sans-serif;
 }
 
 body{
@@ -1015,5 +1015,69 @@ color:#ffff00;
     padding:4px 10px;
     border-radius:20px;
     font-size:12px;
+    font-weight:700;
+}
+
+.brand-slider{
+    width:100%;
+    overflow:hidden;
+    background:#0553ba;
+    padding:12px 0;
+    border-top:1px solid rgba(255,255,255,.08);
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.brand-track{
+    display:flex;
+    width:max-content;
+    animation:scroll 50s linear infinite;
+}
+
+
+.brand-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 18px;
+    margin:0 8px;
+    border-radius:50px;
+    background:#771172;
+    border:1px solid rgba(255,255,255,.12);
+    color:#fff;
+    white-space:nowrap;
+}
+
+.brand-item img{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    object-fit:cover;
+}
+
+.brand-item span{
+    font-size:14px;
+    font-weight:600;
+}
+
+@keyframes scroll{
+    from{
+        transform:translateX(0);
+    }
+    to{
+        transform:translateX(-50%);
+    }
+}
+
+.credit{
+    width:100%;
+    text-align:center;
+    padding:12px;
+    font-size:13px;
+    color:#ba0505;
+    border-top:1px solid rgba(255,255,255,.08);
+}
+
+.credit span{
+    color:#00ff46;
     font-weight:700;
 }
