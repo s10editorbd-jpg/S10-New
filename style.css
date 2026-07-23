@@ -530,6 +530,7 @@ body{
 
 /* Colors */
 .FN{background:#b3f5fd;}
+.NF{background:#d9d2e9;}
 .GEINE{background:#1976D2;}
 .Super{background:#cf0067;}
 .Extension{background:#0620f2;}
@@ -642,7 +643,7 @@ color:#ffff00;
 
 .mistake-card{
 
-    background:#fff;
+    background:#ee3939;
     border-radius:18px;
     padding:25px;
     margin-bottom:20px;
