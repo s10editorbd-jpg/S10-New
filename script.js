@@ -414,6 +414,9 @@ container.innerHTML += mistakes.map(item => {
                 ${item["Subject"]}
             </span>
 
+        <span class="count-badge">
+            @${index + 1}
+        </span>
             <span class="date ${colorClass}">
                 📅 ${date ? date.toLocaleDateString("en-GB") : "-"}
             </span>
