@@ -1048,7 +1048,7 @@ color:#ffff00;
     border-radius:50px;
     background:#000;
     border:1px solid rgba(255,255,255,.12);
-    font-size: 15px;
+    font-size: 20px;
     animation: colorChange 8s infinite;
     white-space:nowrap;
 }
