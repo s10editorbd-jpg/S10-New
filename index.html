@@ -22,10 +22,14 @@
 <body>
 
 <script>
-    // Check Login
     const user = localStorage.getItem("user");
+    const loginDate = localStorage.getItem("loginDate");
+    const today = new Date().toLocaleDateString("en-CA");
 
-    if (!user) {
+    if (!user || loginDate !== today) {
+
+        localStorage.clear();
+
         window.location.replace("login.html");
     }
 </script>
