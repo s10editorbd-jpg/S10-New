@@ -1,4 +1,20 @@
 // ==============================
+// LOGIN CHECK
+// ==============================
+
+const user = localStorage.getItem("user");
+const loginDate = localStorage.getItem("loginDate");
+const today = new Date().toLocaleDateString("en-CA");
+
+if (!user || loginDate !== today) {
+
+    localStorage.clear();
+
+    window.location.replace("login.html");
+
+}
+
+// ==============================
 // Google Apps Script Web App URL
 // ==============================
 const BASE_URL = "https://script.google.com/macros/s/AKfycbx-wNqwK7Ag1bjM2G3Yg1cwiDG45uR7R4d7NGBN2Kmb0SskZJZA-jLIUy3RbaXwbm4H/exec";
