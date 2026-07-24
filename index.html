@@ -21,19 +21,6 @@
 </head>
 <body>
 
-<script>
-    const user = localStorage.getItem("user");
-    const loginDate = localStorage.getItem("loginDate");
-    const today = new Date().toLocaleDateString("en-CA");
-
-    if (!user || loginDate !== today) {
-
-        localStorage.clear();
-
-        window.location.replace("login.html");
-    }
-</script>
-
 <div class="brand-slider">
     <div class="brand-track">
 
@@ -564,18 +551,7 @@
 </div> 
 
 <script>
-function logout(){
 
-    if(confirm("Are you sure you want to logout?")){
-
-        localStorage.removeItem("user");
-        localStorage.removeItem("role");
-
-        window.location.replace("login.html");
-    }
-
-}
-</script>
 <div class="credit">
      © 2026 S10 Portal | Created by <span>𝓐𝓦𝓞𝓛𝓐𝓓 𝓗𝓞𝓢𝓢𝓔𝓝 𝓒𝓗𝓐𝓝</span>
 </div>
