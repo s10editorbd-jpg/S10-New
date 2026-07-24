@@ -21,11 +21,15 @@
         }
 
 body{
-    margin: 0;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    margin:0;
+    height:100vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    position:relative;
+    overflow:hidden;
 
     background: radial-gradient(circle,
         #00c6ff,
@@ -37,23 +41,88 @@ body{
         #df1818
     );
 
-    background-size: 1000% 1000%;
-    animation: gradientMove 60s ease infinite;
+    background-size:1000% 1000%;
+    animation:gradientMove 60s ease infinite;
 }
 
 @keyframes gradientMove{
-    0%{
-        background-position: 0% 0%;
+    0%{background-position:0% 0%;}
+    50%{background-position:100% 100%;}
+    100%{background-position:0% 0%;}
+}
+
+.orbit{
+    position:absolute;
+    width:700px;
+    height:700px;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    animation:spin 30s linear infinite;
+    pointer-events: none; 
+    z-index:1;
+}
+@keyframes spin{
+    from{
+        transform:translate(-50%,-50%) rotate(0deg);
     }
-    50%{
-        background-position: 100% 100%;
+    to{
+        transform:translate(-50%,-50%) rotate(360deg);
     }
-    100%{
-        background-position: 0% 0%;
+}
+.brand{
+    position:absolute;
+    width:70px;
+    height:70px;
+    left:50%;
+    top:50%;
+    margin:-35px;
+}
+
+.brand img{
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid #fff;
+    background:#fff;
+
+    animation: keepStraight 30s linear infinite;
+}
+
+@keyframes keepStraight{
+    from{
+        transform: rotate(0deg);
+    }
+    to{
+        transform: rotate(-360deg);
+    }
+}
+.b12  { transform: rotate(0deg)   translate(300px) rotate(0deg); }
+.b11  { transform: rotate(30deg)  translate(300px) rotate(-30deg); }
+.b10  { transform: rotate(60deg)  translate(300px) rotate(-60deg); }
+.b9  { transform: rotate(90deg)  translate(300px) rotate(-90deg); }
+.b8  { transform: rotate(120deg) translate(300px) rotate(-120deg); }
+.b7  { transform: rotate(150deg) translate(300px) rotate(-150deg); }
+.b6  { transform: rotate(180deg) translate(300px) rotate(-180deg); }
+.b5  { transform: rotate(210deg) translate(300px) rotate(-210deg); }
+.b4  { transform: rotate(240deg) translate(300px) rotate(-240deg); }
+.b3  { transform: rotate(270deg) translate(300px) rotate(-270deg); }
+.b2  { transform: rotate(300deg) translate(300px) rotate(-300deg); }
+.b1  { transform: rotate(330deg) translate(300px) rotate(-330deg); }
+
+@keyframes spin{
+    from{
+        transform:translate(-50%,-50%) rotate(0deg);
+    }
+    to{
+        transform:translate(-50%,-50%) rotate(360deg);
     }
 }
 
         .login-box{
+    position:relative;
+    z-index:10;
 
             width:380px;
 
@@ -132,15 +201,82 @@ body{
             font-size:14px;
 
         }
+.cover{
+    position:absolute;
+    inset:0;
 
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+background:transparent;
+    backdrop-filter:none;;
+
+    cursor:pointer;
+    z-index:5;
+}
+
+.cover img{
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    border:5px solid #fff;
+    object-fit:cover;
+
+    transition:.3s;
+}
+
+.cover img:hover{
+    transform:scale(1.08);
+}
+
+.cover h2{
+    color:#fff;
+    margin-top:20px;
+}
+
+.cover p{
+    color:#fff;
+    margin-top:8px;
+}
+
+.login-box{
+    position:relative;
+    z-index:10;
+
+    width:380px;
+    background:radial-gradient(circle,#2946a4,#00c6ff,#00c6ff,#ffffff);
+
+    padding:35px;
+    border-radius:12px;
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
+
+    display:none;
+}
     </style>
-
 </head>
 
 <body>
-
-<div class="login-box">
-
+<div class="orbit">
+    <div class="brand b1"><img src="dp.jpg"></div>
+    <div class="brand b2"><img src="kv8.jpg"></div>
+    <div class="brand b3"><img src="heybaji.jpg"></div>
+    <div class="brand b4"><img src="jeetbangla.jpg"></div>
+    <div class="brand b5"><img src="jeetway.jpg"></div>
+    <div class="brand b6"><img src="superbaji.jpg"></div>
+    <div class="brand b7"><img src="sbj66.jpg"></div>
+    <div class="brand b8"><img src="bedjdb.jpg"></div>
+    <div class="brand b9"><img src="bn88.jpg"></div>
+    <div class="brand b10"><img src="bdvegas.jpg"></div>
+    <div class="brand b11"><img src="cpc88.jpg"></div>
+    <div class="brand b12"><img src="deshi777.jpg"></div>
+</div>
+<div id="cover" class="cover">
+    <img src="s10.jpg" alt="S10 Portal">
+    <h2><p>Click to Continue</p></h2>
+</div>
+<div class="login-box" id="loginBox">
 <h2>S10 Portal Login</h2>
 
 <input type="text" id="username" placeholder="Username">
@@ -159,10 +295,15 @@ Login
 
 const API="https://script.google.com/macros/s/AKfycbx-wNqwK7Ag1bjM2G3Yg1cwiDG45uR7R4d7NGBN2Kmb0SskZJZA-jLIUy3RbaXwbm4H/exec";
 
-if(localStorage.getItem("user")){
-
-    window.location.href="index.html";
-
+const user = localStorage.getItem("user");
+const loginDate = localStorage.getItem("loginDate");
+const today = new Date().toLocaleDateString("en-CA");
+if (user && loginDate === today) {
+    window.location.href = "index.html";
+} else {
+    localStorage.removeItem("user");
+    localStorage.removeItem("role");
+    localStorage.removeItem("loginDate");
 }
 
 document.addEventListener("keypress",function(e){
@@ -174,7 +315,13 @@ document.addEventListener("keypress",function(e){
     }
 
 });
+const cover = document.getElementById("cover");
+const loginBox = document.getElementById("loginBox");
 
+cover.onclick = function () {
+    cover.style.display = "none";
+    loginBox.style.display = "block";
+};
 function login(){
 
     let username=document.getElementById("username").value.trim();
@@ -231,9 +378,13 @@ function login(){
 
         if(data.success){
 
+         const today = new Date().toLocaleDateString("en-CA");
+
             localStorage.setItem("user",data.username);
 
             localStorage.setItem("role",data.role);
+
+            localStorage.setItem("loginDate", today);
 
             window.location.href="index.html";
 
