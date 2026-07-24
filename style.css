@@ -1048,8 +1048,17 @@ color:#ffff00;
     border-radius:50px;
     background:#000;
     border:1px solid rgba(255,255,255,.12);
-    color:#f7f505;
+    animation: colorChange 8s infinite;
     white-space:nowrap;
+}
+@keyframes colorChange {
+    0%   { color: #ffffff; }  /* White */
+    20%  { color: #00d4ff; }  /* Sky Blue */
+    40%  { color: #ff6b00; }  /* oarange */
+    60%  { color: #00ff88; }  /* Green */
+    80%  { color: #ffcc00; }  /* Yellow */
+    100% { color: #ffffff; }  /* White */
+
 }
 
 .brand-item img{
