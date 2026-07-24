@@ -13,7 +13,6 @@ if (!user || loginDate !== today) {
     window.location.replace("login.html");
 
 }
-
 // ==============================
 // Google Apps Script Web App URL
 // ==============================
