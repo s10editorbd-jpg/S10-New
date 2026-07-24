@@ -263,19 +263,23 @@ body{
 
 }
 
-.topbar{
-
-    text-align:center;
-
-    margin-bottom:25px;
-
+.topbar {
+    text-align: center;
+    margin-bottom: 25px;
 }
 
-.topbar h1{
+.topbar h1 {
+    font-size: 30px;
+    animation: colorChange 8s infinite;
+}
 
-    color:#fff;
-
-    font-size:30px;
+@keyframes colorChange {
+    0%   { color: #ffffff; }  /* White */
+    20%  { color: #00d4ff; }  /* Sky Blue */
+    40%  { color: #ff6b00; }  /* oarange */
+    60%  { color: #00ff88; }  /* Green */
+    80%  { color: #ffcc00; }  /* Yellow */
+    100% { color: #ffffff; }  /* White */
 
 }
 
