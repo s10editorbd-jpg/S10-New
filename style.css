@@ -1049,7 +1049,7 @@ color:#ffff00;
     background:#001d4b;
     border:1px solid rgba(255,255,255,.12);
     font-size: 30px;
-    animation: colorChange 8s infinite;
+    animation: colorChange 10s infinite;
     white-space:nowrap;
 }
 @keyframes colorChange {
