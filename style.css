@@ -113,7 +113,10 @@ body{
     font-size: 16px;
     font-weight: 600;
 }
-
+.menu-item.active {
+    background: linear-gradient(135deg, #00c853, #00e676);
+    border-left: 5px solid #fff;
+}
 .menu-item:hover{
 
     background: linear-gradient(
