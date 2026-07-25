@@ -55,7 +55,9 @@ body{
     100%{
         background-position: 0% 0%;
     }}
-
+.content{
+    margin-left: clamp(220px, 20vw, 300px);
+}
 
 .logo{
     display:flex;
