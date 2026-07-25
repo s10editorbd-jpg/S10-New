@@ -364,11 +364,9 @@ container.innerHTML = `
 <div class="mistake-header">
     <div>
         <h2>Showing mistakes for current month
-</h2>
-        
-    </div>
+</h2></div>
 
-    <div class="month-badge">
+<div class="month-badge">
         📅 ${runningMonth}
     </div>
 </div>
@@ -401,7 +399,7 @@ container.innerHTML = `
     return;
 }
 
-container.innerHTML += mistakes.map(item => {
+container.innerHTML += mistakes.map((item, index) => {
 
     const date = parseDate(item["Date"]);
 
@@ -423,11 +421,11 @@ container.innerHTML += mistakes.map(item => {
     return `
     <div class="mistake-card ${colorClass}">
 
-        <div class="card-top">
+<div class="card-top">
 
-            <span class="subject ${colorClass}">
-                ${item["Subject"]}
-            </span>
+    <span class="subject ${colorClass}">
+        ${item["Subject"]}
+    </span>
 
     <div style="display:flex;align-items:center;gap:8px;">
 
@@ -439,10 +437,12 @@ container.innerHTML += mistakes.map(item => {
             #${index + 1}
         </span>
 
-            <span class="date ${colorClass}">
-                📅 ${date ? date.toLocaleDateString("en-GB") : "-"}
-            </span>
-        </div>
+        <span class="date ${colorClass}">
+            📅 ${date ? date.toLocaleDateString("en-GB") : "-"}
+        </span>
+
+    </div>
+
 </div>
 
         <p class="remarks">
