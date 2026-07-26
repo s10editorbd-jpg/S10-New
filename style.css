@@ -1124,3 +1124,28 @@ color:#ffff00;
     color:#00ff46;
     font-weight:700;
 }
+
+.pagination{
+display:flex;
+justify-content:center;
+gap:8px;
+margin:25px 0;
+}
+
+
+.pagination button{
+
+padding:8px 14px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+
+}
+
+
+.pagination .active-page{
+
+background:#16469d;
+color:white;
+
+}
