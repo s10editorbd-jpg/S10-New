@@ -479,7 +479,7 @@ container.innerHTML += `
 // ==============================
 
 let mistakesPerPage = 10;
-let currentMistakePage = 1;
+let currentMistakePage = Number(localStorage.getItem("mistakePage")) || 1;
 let allMistakeReports = [];
 
 
@@ -489,19 +489,17 @@ function renderAllMistakes(page = currentMistakePage) {
     if (!container) return;
 
 
-    // সব রিপোর্ট নাও
     let mistakes = [...allData];
 
 
-    // True / False Count
     const trueCount = mistakes.filter(item =>
         String(item["Reported in file"] || "").trim().toUpperCase() === "TRUE"
     ).length;
 
+
     const notCounted = mistakes.length - trueCount;
 
 
-    // Sort New to Old
     mistakes.sort((a, b) => {
 
         const dateA = parseDate(a["Date"]) || new Date(0);
@@ -516,20 +514,35 @@ function renderAllMistakes(page = currentMistakePage) {
     });
 
 
-    // Save all data
     allMistakeReports = mistakes;
 
 
-    // Current Page
+    const totalPages = Math.ceil(
+        allMistakeReports.length / mistakesPerPage
+    );
+
+
+    if(page < 1) page = 1;
+    if(page > totalPages) page = totalPages;
+
+
     currentMistakePage = page;
 
 
-    const start = (currentMistakePage - 1) * mistakesPerPage;
+    localStorage.setItem(
+        "mistakePage",
+        currentMistakePage
+    );
+
+
+    const start = 
+    (currentMistakePage - 1) * mistakesPerPage;
+
+
     const end = start + mistakesPerPage;
 
 
-    // Only 20 data
-    mistakes = mistakes.slice(start, end);
+    mistakes = mistakes.slice(start,end);
 
 
 
@@ -561,6 +574,10 @@ function renderAllMistakes(page = currentMistakePage) {
 </div>
 
 `;
+
+
+    // TOP PAGINATION
+    container.innerHTML += renderMistakePagination();
 
 
 
@@ -616,18 +633,16 @@ const screenshotLink =
 String(item["Screenshot link"] || "").trim();
 
 
-
 const reported =
 String(item["Reported in file"] || "")
 .trim()
 .toUpperCase();
 
 
-
 const reportClass =
-reported==="TRUE"
-?"reported-true"
-:"reported-false";
+reported === "TRUE"
+? "reported-true"
+: "reported-false";
 
 
 
@@ -652,9 +667,7 @@ ${item["Subject"] || "-"}
 📅 ${date ? date.toLocaleDateString("en-GB"):"-"}
 </span>
 
-
 </div>
-
 
 
 <p class="remarks">
@@ -678,13 +691,10 @@ ${feedback || "-"}
 </p>
 
 
-
 <hr>
 
 
-
 <div class="links">
-
 
 ${chatLink ?
 `<a href="${chatLink}" target="_blank" class="chat-link">
@@ -692,12 +702,10 @@ ${chatLink ?
 </a>`:""}
 
 
-
 ${screenshotLink ?
 `<a href="${screenshotLink}" target="_blank" class="ss-link">
 🖼 View Screenshot
 </a>`:""}
-
 
 
 ${!chatLink && !screenshotLink ?
@@ -711,7 +719,6 @@ ${!chatLink && !screenshotLink ?
 
 `;
 
-
 }).join("");
 
 
@@ -723,45 +730,47 @@ html
 
 
 
-renderMistakePagination();
-
-}
-function renderMistakePagination(){
-
-const container =
-document.getElementById("reportMistakeContainer");
-
-
-const totalPages =
-Math.ceil(
-allMistakeReports.length / mistakesPerPage
+ // BOTTOM PAGINATION
+container.insertAdjacentHTML(
+"beforeend",
+renderMistakePagination()
 );
 
+
+}
+
+
+
+function renderMistakePagination(){
+
+
+const totalPages = Math.ceil(
+allMistakeReports.length / mistakesPerPage
+);
 
 
 let html = `
 
 <div class="pagination">
 
+
 <button onclick="renderAllMistakes(${currentMistakePage-1})"
-${currentMistakePage===1?"disabled":""}>
+${currentMistakePage === 1 ? "disabled":""}>
 ⬅ Prev
 </button>
 
 `;
 
 
-
 for(let i=1;i<=totalPages;i++){
+
 
 html += `
 
 <button 
 onclick="renderAllMistakes(${i})"
-class="${i===currentMistakePage?'active-page':''}">
-
+class="${i === currentMistakePage ? "active-page":""}">
 ${i}
-
 </button>
 
 `;
@@ -773,7 +782,7 @@ ${i}
 html += `
 
 <button onclick="renderAllMistakes(${currentMistakePage+1})"
-${currentMistakePage===totalPages?"disabled":""}>
+${currentMistakePage === totalPages ? "disabled":""}>
 Next ➡
 </button>
 
@@ -783,11 +792,7 @@ Next ➡
 `;
 
 
-
-container.insertAdjacentHTML(
-"beforeend",
-html
-);
+return html;
 
 
 }
