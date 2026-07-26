@@ -478,172 +478,320 @@ container.innerHTML += `
 // ALL MISTAKES REPORT (Report Page)
 // ==============================
 
-function renderAllMistakes() {
+let mistakesPerPage = 10;
+let currentMistakePage = 1;
+let allMistakeReports = [];
+
+
+function renderAllMistakes(page = currentMistakePage) {
 
     const container = document.getElementById("reportMistakeContainer");
     if (!container) return;
 
+
     // সব রিপোর্ট নাও
     let mistakes = [...allData];
 
-// True / False Count
-const trueCount = mistakes.filter(item =>
-    String(item["Reported in file"] || "").trim().toUpperCase() === "TRUE"
-).length;
 
-const notCounted = mistakes.length - trueCount;
+    // True / False Count
+    const trueCount = mistakes.filter(item =>
+        String(item["Reported in file"] || "").trim().toUpperCase() === "TRUE"
+    ).length;
 
-    // নতুন থেকে পুরাতন সাজাও
+    const notCounted = mistakes.length - trueCount;
+
+
+    // Sort New to Old
     mistakes.sort((a, b) => {
+
         const dateA = parseDate(a["Date"]) || new Date(0);
         const dateB = parseDate(b["Date"]) || new Date(0);
-            if (dateB - dateA !== 0) {
-        return dateB - dateA;
-    }
 
-    // একই তারিখ হলে, বড় Row আগে
-    return b.Row - a.Row;
-});
+        if (dateB - dateA !== 0) {
+            return dateB - dateA;
+        }
 
-    // Header
-container.innerHTML = `
+        return b.Row - a.Row;
+
+    });
+
+
+    // Save all data
+    allMistakeReports = mistakes;
+
+
+    // Current Page
+    currentMistakePage = page;
+
+
+    const start = (currentMistakePage - 1) * mistakesPerPage;
+    const end = start + mistakesPerPage;
+
+
+    // Only 20 data
+    mistakes = mistakes.slice(start, end);
+
+
+
+    container.innerHTML = `
+
 <div class="mistake-header">
 
-    <div>
-        <h2>All Mistakes Reports</h2>
-    </div>
+<div>
+<h2>All Mistakes Reports</h2>
+</div>
 
-    <div style="display:flex;gap:10px;align-items:center;">
 
-        <div class="count-badge">
-            📊 ${mistakes.length} Reports
-        </div>
+<div style="display:flex;gap:10px;align-items:center;">
 
-        <div class="count-badge success">
-           🔴 ${trueCount} Counted
-        </div>
+<div class="count-badge">
+📊 ${allMistakeReports.length} Reports
+</div>
 
-        <div class="count-badge danger">
-            🟢 ${notCounted} Not Counted
-        </div>
+<div class="count-badge success">
+🔴 ${trueCount} Counted
+</div>
 
-    </div>
+<div class="count-badge danger">
+🟢 ${notCounted} Not Counted
+</div>
 
 </div>
+
+</div>
+
 `;
 
-    if (!mistakes.length) {
-        container.innerHTML += `
-            <p class="no-data">
-                No reports found.
-            </p>
-        `;
-        return;
-    }
 
-    const badgeColor = {
-        "Wrong Information": "wrong-information",
-        "Not Follow SOP": "not-follow-sop",
-        "Late Reply": "late-reply",
-        "No Reply": "no-reply",
-        "Angry With Player": "angry-player",
-        "Non Professional": "non-professional",
-        "No solution": "no-solution",
-        "No explanation": "no-explanation",
-        "Verbal warning": "verbal-warning",
-        "Warning letter": "warning-letter"
-    };
 
-    const html = mistakes.map(item => {
+if(!mistakes.length){
 
-        const date = parseDate(item["Date"]);
-        const colorClass = badgeColor[item["Subject"]] || "default";
+container.innerHTML += `
+<p class="no-data">
+No reports found.
+</p>
+`;
 
-        const feedback = String(item["Feedback from (TL/Senior)"] || "").trim();
-        const chatLink = String(item["Chat link"] || "").trim();
-        const screenshotLink = String(item["Screenshot link"] || "").trim();
+return;
+
+}
+
+
+
+const badgeColor = {
+
+"Wrong Information":"wrong-information",
+"Not Follow SOP":"not-follow-sop",
+"Late Reply":"late-reply",
+"No Reply":"no-reply",
+"Angry With Player":"angry-player",
+"Non Professional":"non-professional",
+"No solution":"no-solution",
+"No explanation":"no-explanation",
+"Verbal warning":"verbal-warning",
+"Warning letter":"warning-letter"
+
+};
+
+
+
+const html = mistakes.map(item=>{
+
+
+const date = parseDate(item["Date"]);
+
+const colorClass =
+badgeColor[item["Subject"]] || "default";
+
+
+const feedback =
+String(item["Feedback from (TL/Senior)"] || "").trim();
+
+
+const chatLink =
+String(item["Chat link"] || "").trim();
+
+
+const screenshotLink =
+String(item["Screenshot link"] || "").trim();
+
+
+
 const reported =
-    String(item["Reported in file"] || "").trim().toUpperCase();
+String(item["Reported in file"] || "")
+.trim()
+.toUpperCase();
+
+
 
 const reportClass =
-    reported === "TRUE"
-        ? "reported-true"
-        : "reported-false";
+reported==="TRUE"
+?"reported-true"
+:"reported-false";
 
-const feedbackClass =
-    feedback
-        ? ""
-        : "feedback-empty";
-        return `
-            <div class="mistake-card ${colorClass} ${reportClass}">
 
-                <p class="cs-name">
-                    👤 <strong>${item["CS Name"] || "-"}</strong>
-                </p>
 
-                <div class="card-top">
+return `
 
-                    <span class="subject ${colorClass}">
-                        ${item["Subject"] || "-"}
-                    </span>
+<div class="mistake-card ${colorClass} ${reportClass}">
 
-                    <span class="date ${colorClass}">
-                        📅 ${date ? date.toLocaleDateString("en-GB") : "-"}
-                    </span>
 
-                </div>
+<p class="cs-name">
+👤 <strong>${item["CS Name"] || "-"}</strong>
+</p>
 
-                <p class="remarks ${feedbackClass}">
-                    <strong>Mon REMARKS:</strong><br>
-                    ${item["Detailed Remark"] || "-"}
-                </p>
 
-                <hr>
+<div class="card-top">
 
-                <p class="remarks">
-                    <strong>Feedback from (TL/Senior):</strong><br>
-                    ${feedback || "-"}
-                </p>
+<span class="subject ${colorClass}">
+${item["Subject"] || "-"}
+</span>
 
-                <hr>
 
-                <div class="links">
+<span class="date ${colorClass}">
+📅 ${date ? date.toLocaleDateString("en-GB"):"-"}
+</span>
 
-                    ${
-                        chatLink
-                        ? `<a href="${chatLink}" target="_blank" class="chat-link">💬 View Chat</a>`
-                        : ""
-                    }
 
-                    ${
-                        screenshotLink
-                        ? `<a href="${screenshotLink}" target="_blank" class="ss-link">🖼 View Screenshot</a>`
-                        : ""
-                    }
+</div>
 
-                    ${
-                        !chatLink && !screenshotLink
-                        ? `<span>No Attachment</span>`
-                        : ""
-                    }
 
-                </div>
 
-            </div>
-        `;
+<p class="remarks">
 
-    }).join("");
+<strong>Mon REMARKS:</strong><br>
 
-container.insertAdjacentHTML("beforeend", html);
+${item["Detailed Remark"] || "-"}
 
-    container.innerHTML += `
-        <div class="end-list">
-            <hr>
-            <span>ⓘ End of list</span>
-            <hr>
-        </div>
-    `;
+</p>
+
+
+<hr>
+
+
+<p class="remarks">
+
+<strong>Feedback from (TL/Senior):</strong><br>
+
+${feedback || "-"}
+
+</p>
+
+
+
+<hr>
+
+
+
+<div class="links">
+
+
+${chatLink ?
+`<a href="${chatLink}" target="_blank" class="chat-link">
+💬 View Chat
+</a>`:""}
+
+
+
+${screenshotLink ?
+`<a href="${screenshotLink}" target="_blank" class="ss-link">
+🖼 View Screenshot
+</a>`:""}
+
+
+
+${!chatLink && !screenshotLink ?
+"<span>No Attachment</span>":""}
+
+
+</div>
+
+
+</div>
+
+`;
+
+
+}).join("");
+
+
+
+container.insertAdjacentHTML(
+"beforeend",
+html
+);
+
+
+
+renderMistakePagination();
+
 }
+function renderMistakePagination(){
+
+const container =
+document.getElementById("reportMistakeContainer");
+
+
+const totalPages =
+Math.ceil(
+allMistakeReports.length / mistakesPerPage
+);
+
+
+
+let html = `
+
+<div class="pagination">
+
+<button onclick="renderAllMistakes(${currentMistakePage-1})"
+${currentMistakePage===1?"disabled":""}>
+⬅ Prev
+</button>
+
+`;
+
+
+
+for(let i=1;i<=totalPages;i++){
+
+html += `
+
+<button 
+onclick="renderAllMistakes(${i})"
+class="${i===currentMistakePage?'active-page':''}">
+
+${i}
+
+</button>
+
+`;
+
+}
+
+
+
+html += `
+
+<button onclick="renderAllMistakes(${currentMistakePage+1})"
+${currentMistakePage===totalPages?"disabled":""}>
+Next ➡
+</button>
+
+
+</div>
+
+`;
+
+
+
+container.insertAdjacentHTML(
+"beforeend",
+html
+);
+
+
+}
+
 
 // ==============================
 // LINKS
