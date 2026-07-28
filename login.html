@@ -9,17 +9,12 @@
 
 <title>S10 Portal Login</title>
 
-
 <link rel="icon" type="image/png"
 href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFqhBaNVK_GbQaJqJVUa0Y2succ7kactyGor7iYzggYQ&s">
 
-
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-
 <style>
-
-
 *{
     margin:0;
     padding:0;
@@ -27,23 +22,13 @@ href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFqhBaNVK_GbQaJqJVUa
     font-family:'Poppins',sans-serif;
 }
 
-
-
 body{
-
     height:100vh;
-
     display:flex;
-
     justify-content:center;
-
     align-items:center;
-
     overflow:hidden;
-
     position:relative;
-
-
     background:
     radial-gradient(circle,
     #00c6ff,
@@ -52,1074 +37,479 @@ body{
     #18df1e,
     #2946a4,
     #df1818);
-
-
     background-size:1000% 1000%;
-
     animation:gradientMove 60s ease infinite;
-
 }
-
-
-
 @keyframes gradientMove{
-
 0%{
     background-position:0% 0%;
 }
-
 50%{
     background-position:100% 100%;
 }
-
 100%{
     background-position:0% 0%;
 }
-
 }
-
-
-
-/* Orbit */
 
 .orbit{
-
     position:absolute;
-
     width:700px;
-
     height:700px;
-
     left:50%;
-
     top:50%;
-
     transform:translate(-50%,-50%);
-
     animation:orbitSpin 30s linear infinite;
-
     pointer-events:none;
-
     z-index:1;
-
 }
-
-
-
 @keyframes orbitSpin{
-
 from{
-
 transform:translate(-50%,-50%) rotate(0deg);
-
 }
-
 to{
-
 transform:translate(-50%,-50%) rotate(360deg);
-
 }
-
 }
-
-
-
-/* Brand Circle */
-
 
 .brand{
-
     position:absolute;
-
     width:70px;
-
     height:70px;
-
     left:50%;
-
     top:50%;
-
     margin:-35px;
-
 }
-
-
 
 .brand img{
-
     width:100%;
-
     height:100%;
-
     border-radius:50%;
-
     object-fit:cover;
-
     background:#fff;
-
     border:3px solid #fff;
-
-
     animation:brandRotate 30s linear infinite;
-
 }
-
-
-
 @keyframes brandRotate{
-
 from{
-
 transform:rotate(0deg);
-
 }
-
 to{
-
 transform:rotate(-360deg);
-
 }
-
 }
-
-
-
-/* Brand Position */
-
 
 .b1{
 transform:rotate(330deg) translate(300px) rotate(-330deg);
 }
-
 .b2{
 transform:rotate(300deg) translate(300px) rotate(-300deg);
 }
-
 .b3{
 transform:rotate(270deg) translate(300px) rotate(-270deg);
 }
-
 .b4{
 transform:rotate(240deg) translate(300px) rotate(-240deg);
 }
-
 .b5{
 transform:rotate(210deg) translate(300px) rotate(-210deg);
 }
-
 .b6{
 transform:rotate(180deg) translate(300px) rotate(-180deg);
 }
-
 .b7{
 transform:rotate(150deg) translate(300px) rotate(-150deg);
 }
-
 .b8{
 transform:rotate(120deg) translate(300px) rotate(-120deg);
 }
-
 .b9{
 transform:rotate(90deg) translate(300px) rotate(-90deg);
 }
-
 .b10{
 transform:rotate(60deg) translate(300px) rotate(-60deg);
 }
-
 .b11{
 transform:rotate(30deg) translate(300px) rotate(-30deg);
 }
-
 .b12{
 transform:rotate(0deg) translate(300px) rotate(0deg);
 }
 
-
-
-
-
-/* Click Cover */
-
-
 .cover{
-
     position:absolute;
-
     inset:0;
-
     display:flex;
-
     justify-content:center;
-
     align-items:center;
-
     flex-direction:column;
-
     cursor:pointer;
-
     z-index:5;
-
 }
-
-
 
 
 .cover img{
-
     width:180px;
-
     height:180px;
-
     border-radius:50%;
-
     object-fit:cover;
-
-    border:5px solid #fff;
-
-    transition:.3s;
-
+   border:5px solid #fff;
+  transition:.3s;
 }
-
-
 
 .cover img:hover{
-
     transform:scale(1.08);
-
 }
-
-
 
 .cover h2{
-
     color:#fff;
-
     margin-top:20px;
-
 }
-
-
 
 .cover p{
-
     color:#fff;
-
 }
-
-
-
-
-
-/* Jarvis Ring */
-
 
 .jarvis{
-
     width:220px;
-
     height:220px;
-
     display:flex;
-
     justify-content:center;
-
     align-items:center;
-
     position:relative;
-
 }
-
-
 
 .jarvis img{
-
     width:170px;
-
     height:170px;
-
     border-radius:50%;
-
     position:relative;
-
     z-index:10;
-
 }
-
-
-
-
 
 .ring{
-
     position:absolute;
-
     border-radius:50%;
-
 }
-
-
-
+    
 .ring1{
-
     width:210px;
-
     height:210px;
-
     border:3px solid #00e5ff;
-
     border-left-color:transparent;
-
     animation:ringRotate 6s linear infinite;
-
 }
-
-
 
 .ring2{
-
     width:245px;
-
     height:245px;
-
     border:2px solid #fff;
-
     border-right-color:transparent;
-
     animation:ringReverse 9s linear infinite;
-
 }
-
-
 
 .ring3{
-
     width:280px;
-
     height:280px;
-
     border:2px dashed #00ffff;
-
     animation:ringRotate 14s linear infinite;
-
 }
-
-
-
 @keyframes ringRotate{
-
 from{
-
 transform:rotate(0deg);
-
 }
-
 to{
-
 transform:rotate(360deg);
-
 }
-
 }
-
-
 
 @keyframes ringReverse{
-
 from{
-
 transform:rotate(360deg);
-
 }
-
 to{
-
 transform:rotate(0deg);
-
 }
-
 }
-
-
-
-
-
-/* Login Box */
-
 
 .login-box{
-
     width:380px;
-
     padding:35px;
-
     background:
     radial-gradient(circle,
     #2946a4,
     #00c6ff,
     #ffffff);
-
-
     border-radius:15px;
-
     box-shadow:
     0 10px 30px rgba(0,0,0,.25);
-
-
     position:relative;
-
     z-index:10;
-
     display:none;
 
-
     animation:showLogin .5s ease;
-
 }
-
-
-
 @keyframes showLogin{
-
 from{
-
 opacity:0;
-
 transform:scale(.8);
-
 }
-
 to{
-
 opacity:1;
-
 transform:scale(1);
-
 }
-
 }
-
-
-
 .login-box h2{
-
     text-align:center;
-
     margin-bottom:30px;
-
     color:#000;
-
 }
-
-
 
 input{
-
     width:100%;
-
     padding:12px;
-
     margin-bottom:15px;
-
     border:none;
-
     border-radius:8px;
-
     outline:none;
-
     font-size:15px;
-
 }
-
-
-
 
 button{
-
     width:100%;
-
     padding:12px;
-
     border:none;
-
     border-radius:8px;
-
     background:#16a34a;
-
     color:#fff;
-
     font-size:16px;
-
     cursor:pointer;
-
     transition:.3s;
-
 }
-
-
 
 button:hover{
-
     background:#d10a0a;
-
 }
-
-
 
 button:disabled{
-
     opacity:.6;
-
-    cursor:not-allowed;
-
+  cursor:not-allowed;
 }
-
-
-
-
 #msg{
-
     margin-top:15px;
-
     text-align:center;
-
     color:red;
-
     font-size:14px;
-
 }
-
-
-
-
-/* Mobile */
-
-
 @media(max-width:600px){
-
-
 .orbit{
-
 width:450px;
-
 height:450px;
-
 }
-
-
-
 .brand{
-
 width:50px;
-
 height:50px;
-
 margin:-25px;
-
 }
-
-
-
 .b1,.b2,.b3,.b4,.b5,.b6,
 .b7,.b8,.b9,.b10,.b11,.b12{
-
 transform:rotate(0deg) translate(200px);
-
 }
-
-
-
 .login-box{
-
 width:90%;
-
 }
-
-
-
 }
-
 </style>
 
 </head>
 <body>
-
-
-<!-- Rotating Brand Orbit -->
-
+    
 <div class="orbit">
-
     <div class="brand b1">
         <img src="dp.jpg" alt="DP">
     </div>
-
-
     <div class="brand b2">
         <img src="kv8.jpg" alt="KV8">
     </div>
-
-
     <div class="brand b3">
         <img src="heybaji.jpg" alt="HeyBaji">
     </div>
-
-
     <div class="brand b4">
         <img src="jeetbangla.jpg" alt="Jeet Bangla">
     </div>
-
-
     <div class="brand b5">
         <img src="jeetway.jpg" alt="Jeetway">
     </div>
-
-
     <div class="brand b6">
         <img src="superbaji.jpg" alt="Super Baji">
     </div>
-
-
     <div class="brand b7">
         <img src="sbj66.jpg" alt="SBJ66">
     </div>
-
-
     <div class="brand b8">
         <img src="bedjdb.jpg" alt="BDJDB">
     </div>
-
-
     <div class="brand b9">
         <img src="bn88.jpg" alt="BN88">
     </div>
-
-
     <div class="brand b10">
         <img src="bdvegas.jpg" alt="BD Vegas">
     </div>
-
-
     <div class="brand b11">
         <img src="cpc88.jpg" alt="CPC88">
     </div>
-
-
     <div class="brand b12">
         <img src="deshi777.jpg" alt="Deshi777">
     </div>
-
-
 </div>
-
-
-
-
-
-<!-- Initial Click Screen -->
 
 <div id="cover" class="cover">
-
-
     <div class="jarvis">
-
-
         <div class="ring ring1"></div>
-
         <div class="ring ring2"></div>
-
         <div class="ring ring3"></div>
-
-
-
         <img src="s10.jpg" alt="S10 Portal">
-
-
     </div>
-
-
-
     <h2>S10 Portal</h2>
-
     <p>Click to Login</p>
-
-
 </div>
 
-
-
-
-
-
-
-<!-- Login Box -->
-
-
 <div class="login-box" id="loginBox">
-
-
     <h2>
         S10 Portal Login
     </h2>
-
-
-
     <input 
     type="text" 
     id="username" 
     placeholder="Username"
     autocomplete="username">
-
-
-
     <input 
     type="password" 
     id="password" 
     placeholder="Password"
     autocomplete="current-password">
-
-
-
     <button id="loginBtn" onclick="login()">
-
         Login
-
     </button>
-
-
-
     <p id="msg"></p>
-
-
-
 </div>
-
     <script>
-
-
 // Google Apps Script API URL
 
 const API =
 "https://script.google.com/macros/s/AKfycbx-wNqwK7Ag1bjM2G3Yg1cwiDG45uR7R4d7NGBN2Kmb0SskZJZA-jLIUy3RbaXwbm4H/exec";
 
-
-
-
-// Check Existing Login Session
-
 const savedUser = localStorage.getItem("user");
-
 const savedLoginDate = localStorage.getItem("loginDate");
-
 const today = new Date().toLocaleDateString("en-CA");
 
-
-
 if(savedUser && savedLoginDate === today){
-
     window.location.href = "index.html";
-
 }
-
 else{
-
     localStorage.removeItem("user");
-
     localStorage.removeItem("role");
-
     localStorage.removeItem("loginDate");
-
 }
-
-
-
-
-
-
-
-// Enter Key Login
 
 document.addEventListener("keydown",function(e){
-
-
     if(e.key === "Enter"){
-
         login();
-
     }
-
-
 });
 
-
-
-
-
-
-
-// Click S10 Logo To Open Login
-
-
 const cover = document.getElementById("cover");
-
 const loginBox = document.getElementById("loginBox");
-
 const orbit = document.querySelector(".orbit");
-
-
-
 cover.onclick = function(){
-
-
     cover.style.display = "none";
-
-
     loginBox.style.display = "block";
 
-
-    // Stop orbit animation after opening login
-
     if(orbit){
-
         orbit.style.animationPlayState = "paused";
-
     }
-
-
 };
 
-
-
-
-
-
-
-
-
-// Login Function
-
-
 function login(){
-
-
-
     const username =
     document.getElementById("username").value.trim();
-
-
-
     const password =
     document.getElementById("password").value.trim();
-
-
-
     const msg =
     document.getElementById("msg");
-
-
-
     const btn =
     document.getElementById("loginBtn");
-
-
-
-
     msg.innerHTML = "";
-
-
-
-
-
     if(username === "" || password === ""){
-
-
         msg.innerHTML =
         "Please enter Username and Password";
-
-
         return;
-
-
     }
-
-
-
-
-
     btn.innerHTML = "Checking...";
-
-
     btn.disabled = true;
-
-
-
-
-
-
-
     fetch(API,{
-
-
         method:"POST",
-
-
-
         headers:{
-
-
             "Content-Type":
             "text/plain;charset=utf-8"
-
-
         },
-
-
-
         body:JSON.stringify({
-
-
             action:"login",
-
-
             username:username,
-
-
             password:password
-
-
-
         })
-
-
     })
-
-
-
     .then(response=>{
-
-
         if(!response.ok){
-
-
             throw new Error("Server Error");
-
-
         }
-
-
         return response.json();
-
-
     })
-
-
-
     .then(data=>{
-
-
-
         btn.innerHTML = "Login";
-
-
         btn.disabled = false;
-
-
-
-
-
         if(data.success){
-
-
-
             const loginDate =
             new Date().toLocaleDateString("en-CA");
-
-
-
-
             localStorage.setItem(
                 "user",
                 data.username
             );
-
-
-
             localStorage.setItem(
                 "role",
                 data.role
             );
-
-
-
             localStorage.setItem(
                 "loginDate",
                 loginDate
             );
-
-
-
-
-            // Redirect Dashboard
-
-
             window.location.href =
             "index.html";
-
-
-
         }
-
-
-
         else{
-
-
             msg.innerHTML =
             data.message || "Invalid Login";
 
-
         }
-
-
-
     })
-
-
 
     .catch(error=>{
 
-
-
         btn.innerHTML = "Login";
-
 
         btn.disabled = false;
 
-
-
         msg.innerHTML =
         "Error: " + error.message;
-
-
 
         console.log(
             "LOGIN ERROR:",
             error
         );
-
-
-
     });
-
-
-
 }
-
-
-
 </script>
 
-
 </body>
-
 </html>
     
