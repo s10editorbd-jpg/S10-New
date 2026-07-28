@@ -396,7 +396,7 @@ width:90%;
     <script>
 // Google Apps Script API URL
 
-const API =
+const BASE_URL =
 "https://script.google.com/macros/s/AKfycbx-wNqwK7Ag1bjM2G3Yg1cwiDG45uR7R4d7NGBN2Kmb0SskZJZA-jLIUy3RbaXwbm4H/exec";
 
 const savedUser = localStorage.getItem("user");
@@ -447,7 +447,7 @@ function login(){
     }
     btn.innerHTML = "Checking...";
     btn.disabled = true;
-    fetch(API,{
+    fetch(BASE_URL,{
         method:"POST",
         headers:{
             "Content-Type":
