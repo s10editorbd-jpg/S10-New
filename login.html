@@ -241,166 +241,18 @@ background:transparent;
     margin-top:8px;
 }
 
-.login-btn{
+.login-box{
+    position:relative;
+    z-index:10;
 
-width:100%;
+    width:380px;
+    background:radial-gradient(circle,#2946a4,#00c6ff,#00c6ff,#ffffff);
 
-padding:15px;
+    padding:35px;
+    border-radius:12px;
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
 
-border:none;
-
-outline:none;
-
-border-radius:30px;
-
-cursor:pointer;
-
-font-size:18px;
-
-font-weight:600;
-
-letter-spacing:3px;
-
-color:white;
-
-background:
-linear-gradient(
-90deg,
-#00c6ff,
-#6a11cb,
-#00ff99
-);
-
-background-size:300%;
-
-animation:buttonMove 5s infinite;
-
-box-shadow:0 0 20px cyan;
-
-transition:.4s;
-
-}
-
-
-
-@keyframes buttonMove{
-
-0%{
-background-position:0%;
-}
-
-50%{
-background-position:100%;
-}
-
-100%{
-background-position:0%;
-}
-
-}
-
-
-
-.login-btn:hover{
-
-transform:translateY(-5px);
-
-box-shadow:
-
-0 0 25px cyan,
-0 0 60px cyan;
-
-}
-
-
-
-.login-btn:active{
-
-transform:scale(.95);
-
-}
-
-
-
-.login-btn:disabled{
-
-opacity:.7;
-
-cursor:not-allowed;
-
-}
-/* MESSAGE */
-
-#msg{
-
-margin-top:20px;
-
-text-align:center;
-
-font-size:15px;
-
-}
-
-
-
-.error-msg{
-
-padding:12px;
-
-border-radius:15px;
-
-color:white;
-
-background:rgba(255,0,0,.25);
-
-border:1px solid red;
-
-box-shadow:0 0 20px red;
-
-animation:messageShow .5s ease;
-
-}
-
-
-
-.success-msg{
-
-padding:12px;
-
-border-radius:15px;
-
-color:white;
-
-background:rgba(0,255,150,.25);
-
-border:1px solid #00ff99;
-
-box-shadow:0 0 20px #00ff99;
-
-animation:messageShow .5s ease;
-
-}
-
-
-
-@keyframes messageShow{
-
-from{
-
-opacity:0;
-
-transform:translateY(-20px);
-
-}
-
-to{
-
-opacity:1;
-
-transform:translateY(0);
-
-}
-
+    display:none;
 }
     </style>
 </head>
