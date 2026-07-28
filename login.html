@@ -241,18 +241,166 @@ background:transparent;
     margin-top:8px;
 }
 
-.login-box{
-    position:relative;
-    z-index:10;
+.login-btn{
 
-    width:380px;
-    background:radial-gradient(circle,#2946a4,#00c6ff,#00c6ff,#ffffff);
+width:100%;
 
-    padding:35px;
-    border-radius:12px;
-    box-shadow:0 10px 25px rgba(0,0,0,.15);
+padding:15px;
 
-    display:none;
+border:none;
+
+outline:none;
+
+border-radius:30px;
+
+cursor:pointer;
+
+font-size:18px;
+
+font-weight:600;
+
+letter-spacing:3px;
+
+color:white;
+
+background:
+linear-gradient(
+90deg,
+#00c6ff,
+#6a11cb,
+#00ff99
+);
+
+background-size:300%;
+
+animation:buttonMove 5s infinite;
+
+box-shadow:0 0 20px cyan;
+
+transition:.4s;
+
+}
+
+
+
+@keyframes buttonMove{
+
+0%{
+background-position:0%;
+}
+
+50%{
+background-position:100%;
+}
+
+100%{
+background-position:0%;
+}
+
+}
+
+
+
+.login-btn:hover{
+
+transform:translateY(-5px);
+
+box-shadow:
+
+0 0 25px cyan,
+0 0 60px cyan;
+
+}
+
+
+
+.login-btn:active{
+
+transform:scale(.95);
+
+}
+
+
+
+.login-btn:disabled{
+
+opacity:.7;
+
+cursor:not-allowed;
+
+}
+/* MESSAGE */
+
+#msg{
+
+margin-top:20px;
+
+text-align:center;
+
+font-size:15px;
+
+}
+
+
+
+.error-msg{
+
+padding:12px;
+
+border-radius:15px;
+
+color:white;
+
+background:rgba(255,0,0,.25);
+
+border:1px solid red;
+
+box-shadow:0 0 20px red;
+
+animation:messageShow .5s ease;
+
+}
+
+
+
+.success-msg{
+
+padding:12px;
+
+border-radius:15px;
+
+color:white;
+
+background:rgba(0,255,150,.25);
+
+border:1px solid #00ff99;
+
+box-shadow:0 0 20px #00ff99;
+
+animation:messageShow .5s ease;
+
+}
+
+
+
+@keyframes messageShow{
+
+from{
+
+opacity:0;
+
+transform:translateY(-20px);
+
+}
+
+to{
+
+opacity:1;
+
+transform:translateY(0);
+
+}
+
 }
     </style>
 </head>
@@ -273,8 +421,12 @@ background:transparent;
     <div class="brand b12"><img src="deshi777.jpg"></div>
 </div>
 <div id="cover" class="cover">
+    <div class="jarvis">
+<div class="ring ring1"></div>
+<div class="ring ring2"></div>
+<div class="ring ring3"></div>
     <img src="s10.jpg" alt="S10 Portal">
-    <h2><p>Click to Continue</p></h2>
+    <h2><p>CLICK ANYWHERE TO ENTER</p></h2>
 </div>
 <div class="login-box" id="loginBox">
 <h2>S10 Portal Login</h2>
