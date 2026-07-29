@@ -5,92 +5,269 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<meta
+name="theme-color"
+content="#001122">
+
+<meta
+name="description"
+content="S10 Portal Login System">
 
 <title>S10 Portal Login</title>
 
-<link rel="icon" type="image/png"
+<link
+rel="icon"
+type="image/png"
 href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFqhBaNVK_GbQaJqJVUa0Y2succ7kactyGor7iYzggYQ&s">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- Google Fonts -->
+
+<link
+rel="preconnect"
+href="https://fonts.googleapis.com">
+
+<link
+rel="preconnect"
+href="https://fonts.gstatic.com"
+crossorigin>
+
+<link
+href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
+rel="stylesheet">
 
 <style>
+
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Poppins',sans-serif;
+
+margin:0;
+
+padding:0;
+
+box-sizing:border-box;
+
+}
+
+html{
+
+width:100%;
+
+height:100%;
+
 }
 
 body{
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    overflow:hidden;
-    position:relative;
-    background:
-    radial-gradient(circle,#00c6ff,#2946a4,#6a11cb,#18df1e,#2946a4,#df1818);
-    background-size:1000% 1000%;
-    animation:gradientMove 60s ease infinite;
+
+width:100%;
+
+min-height:100vh;
+
+overflow:hidden;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+position:relative;
+
+font-family:'Orbitron',sans-serif;
+
+background:
+
+radial-gradient(
+
+circle at center,
+
+#001f3f 0%,
+
+#000814 55%,
+
+#000000 100%
+
+);
+
+color:#00ffff;
+
+user-select:none;
+
+-webkit-font-smoothing:antialiased;
+
+-moz-osx-font-smoothing:grayscale;
+
 }
-@keyframes gradientMove{
-0%{
-    background-position:0% 0%;
-}
-50%{
-    background-position:100% 100%;
-}
-100%{
-    background-position:0% 0%;
-}
+
+
+#matrix{
+
+position:fixed;
+
+top:0;
+
+left:0;
+
+width:100%;
+
+height:100%;
+
+pointer-events:none;
+
+z-index:0;
+
 }
 
 .orbit{
-    position:absolute;
-    width:700px;
-    height:700px;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
-    animation:orbitSpin 30s linear infinite;
-    pointer-events:none;
-    z-index:1;
+
+position:absolute;
+
+width:700px;
+
+height:700px;
+
+left:50%;
+
+top:50%;
+
+transform:translate(-50%,-50%);
+
+animation:
+
+orbitSpin 30s linear infinite;
+
+pointer-events:none;
+
+z-index:1;
+
 }
+
 @keyframes orbitSpin{
+
 from{
-transform:translate(-50%,-50%) rotate(0deg);
+
+transform:
+
+translate(-50%,-50%)
+
+rotate(0deg);
+
 }
+
 to{
-transform:translate(-50%,-50%) rotate(360deg);
+
+transform:
+
+translate(-50%,-50%)
+
+rotate(360deg);
+
 }
+
 }
 
 .brand{
-    position:absolute;
-    width:70px;
-    height:70px;
-    left:50%;
-    top:50%;
-    margin:-35px;
+
+position:absolute;
+
+width:70px;
+
+height:70px;
+
+left:50%;
+
+top:50%;
+
+margin:-35px;
+
 }
 
 .brand img{
-    width:100%;
-    height:100%;
-    border-radius:50%;
-    object-fit:cover;
-    background:#fff;
-    border:3px solid #fff;
-    animation:brandRotate 30s linear infinite;
+
+width:100%;
+
+height:100%;
+
+object-fit:cover;
+
+border-radius:50%;
+
+background:#ffffff;
+
+border:3px solid #ffffff;
+
+animation:
+
+brandRotate 30s linear infinite,
+
+glow 2s ease-in-out infinite;
+
+transition:.35s;
+
 }
+
+/* Logo Hover */
+
+.brand img:hover{
+
+transform:scale(1.12);
+
+box-shadow:
+
+0 0 18px #00ffff,
+
+0 0 35px #00ffff;
+
+}
+
+
 @keyframes brandRotate{
+
 from{
+
 transform:rotate(0deg);
+
 }
+
 to{
+
 transform:rotate(-360deg);
+
 }
+
+}
+
+
+@keyframes glow{
+
+0%,100%{
+
+box-shadow:
+
+0 0 10px #00ffff,
+
+0 0 20px #00ffff;
+
+filter:brightness(1);
+
+}
+
+50%{
+
+box-shadow:
+
+0 0 25px #00ffff,
+
+0 0 45px #00ffff,
+
+0 0 70px #00ffff;
+
+filter:brightness(1.3);
+
+}
+
 }
 
 .b1{transform:rotate(330deg) translate(300px) rotate(-330deg);}
@@ -107,380 +284,1273 @@ transform:rotate(-360deg);
 .b12{transform:rotate(0deg) translate(300px) rotate(0deg);}
 
 .cover{
-    position:absolute;
-    inset:0;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    cursor:pointer;
-    z-index:5;
-}
 
-.cover img{
-    width:180px;
-    height:180px;
-    border-radius:50%;
-    object-fit:cover;
-   border:5px solid #fff;
-  transition:.3s;
-}
+position:absolute;
 
-.cover img:hover{
-    transform:scale(1.08);
-}
+inset:0;
 
-.cover h2{
-    color:#fff;
-    margin-top:20px;
-}
+display:flex;
 
-.cover p{
-    color:#fff;
+justify-content:center;
+
+align-items:center;
+
+flex-direction:column;
+
+cursor:pointer;
+
+z-index:5;
+
+transition:.4s;
+
 }
 
 .jarvis{
-    width:220px;
-    height:220px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    position:relative;
+
+position:relative;
+
+width:220px;
+
+height:220px;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
 }
 
 .jarvis img{
-    width:170px;
-    height:170px;
-    border-radius:50%;
-    position:relative;
-    z-index:10;
+
+width:170px;
+
+height:170px;
+
+object-fit:cover;
+
+border-radius:50%;
+
+position:relative;
+
+z-index:10;
+
+border:4px solid rgba(255,255,255,.9);
+
+box-shadow:
+
+0 0 20px rgba(0,255,255,.35),
+
+0 0 45px rgba(0,255,255,.25);
+
+transition:.35s;
+
+}
+
+.jarvis img:hover{
+
+transform:scale(1.05);
+
+box-shadow:
+
+0 0 30px #00ffff,
+
+0 0 60px #00ffff;
+
 }
 
 .ring{
-    position:absolute;
-    border-radius:50%;
+
+position:absolute;
+
+border-radius:50%;
+
+pointer-events:none;
+
 }
-    
+
 .ring1{
-    width:210px;
-    height:210px;
-    border:3px solid #00e5ff;
-    border-left-color:transparent;
-    animation:ringRotate 6s linear infinite;
+
+width:210px;
+
+height:210px;
+
+border:3px solid #00e5ff;
+
+border-left-color:transparent;
+
+animation:ringRotate 6s linear infinite;
+
 }
 
 .ring2{
-    width:245px;
-    height:245px;
-    border:2px solid #fff;
-    border-right-color:transparent;
-    animation:ringReverse 9s linear infinite;
+
+width:245px;
+
+height:245px;
+
+border:2px solid rgba(255,255,255,.9);
+
+border-right-color:transparent;
+
+animation:ringReverse 9s linear infinite;
+
 }
 
 .ring3{
-    width:280px;
-    height:280px;
-    border:2px dashed #00ffff;
-    animation:ringRotate 14s linear infinite;
+
+width:280px;
+
+height:280px;
+
+border:2px dashed #00ffff;
+
+opacity:.75;
+
+animation:ringRotate 14s linear infinite;
+
 }
+
 @keyframes ringRotate{
+
 from{
+
 transform:rotate(0deg);
+
 }
+
 to{
+
 transform:rotate(360deg);
+
 }
+
 }
 
 @keyframes ringReverse{
+
 from{
+
 transform:rotate(360deg);
+
 }
+
 to{
+
 transform:rotate(0deg);
+
 }
+
 }
 
 .login-box{
-    width:380px;
-    padding:35px;
-    background:
-    radial-gradient(circle,
-    #2946a4,
-    #00c6ff,
-    #ffffff);
-    border-radius:15px;
-    box-shadow:
-    0 10px 30px rgba(0,0,0,.25);
-    position:relative;
-    z-index:10;
-    display:none;
 
-    animation:showLogin .5s ease;
+width:390px;
+
+max-width:92%;
+
+padding:35px;
+
+background:
+
+rgba(0,255,255,.12);
+
+backdrop-filter:blur(20px);
+
+-webkit-backdrop-filter:blur(20px);
+
+border:
+
+1px solid rgba(0,255,255,.45);
+
+border-radius:22px;
+
+box-shadow:
+
+0 0 30px rgba(0,255,255,.35),
+
+0 0 70px rgba(0,255,255,.15);
+
+display:none;
+
+z-index:10;
+
+animation:
+
+loginShow .5s ease;
+
 }
-@keyframes showLogin{
+
+
+@keyframes loginShow{
+
 from{
+
 opacity:0;
-transform:scale(.8);
+
+transform:translateY(30px) scale(.95);
+
 }
+
 to{
+
 opacity:1;
-transform:scale(1);
+
+transform:translateY(0) scale(1);
+
 }
+
 }
+
+
 .login-box h2{
-    text-align:center;
-    margin-bottom:30px;
-    color:#000;
+
+text-align:center;
+
+margin-bottom:25px;
+
+font-size:22px;
+
+letter-spacing:2px;
+
+color:#ffffff;
+
+text-shadow:
+
+0 0 10px #00ffff;
+
 }
 
 input{
-    width:100%;
-    padding:12px;
-    margin-bottom:15px;
-    border:none;
-    border-radius:8px;
-    outline:none;
-    font-size:15px;
+
+width:100%;
+
+padding:14px;
+
+margin-bottom:16px;
+
+background:
+
+rgba(0,20,35,.9);
+
+border:
+
+1px solid rgba(0,255,255,.5);
+
+border-radius:10px;
+
+color:#ffffff;
+
+font-size:15px;
+
+outline:none;
+
+transition:.3s;
+
+}
+
+
+input::placeholder{
+
+color:rgba(255,255,255,.55);
+
+}
+
+
+input:focus{
+
+border-color:#00ffff;
+
+box-shadow:
+
+0 0 15px rgba(0,255,255,.5);
+
 }
 
 button{
-    width:100%;
-    padding:12px;
-    border:none;
-    border-radius:8px;
-    background:#16a34a;
-    color:#fff;
-    font-size:16px;
-    cursor:pointer;
-    transition:.3s;
+
+width:100%;
+
+padding:14px;
+
+border:none;
+
+border-radius:12px;
+
+background:
+
+linear-gradient(
+
+135deg,
+
+#00c6ff,
+
+#0072ff
+
+);
+
+color:#ffffff;
+
+font-size:16px;
+
+font-weight:700;
+
+letter-spacing:1px;
+
+cursor:pointer;
+
+transition:.3s;
+
+box-shadow:
+
+0 8px 25px rgba(0,114,255,.35);
+
 }
+
 
 button:hover{
-    background:#d10a0a;
+
+transform:translateY(-3px);
+
+box-shadow:
+
+0 12px 35px rgba(0,255,255,.45);
+
 }
 
+
+button:active{
+
+transform:scale(.98);
+
+}
+
+
 button:disabled{
-    opacity:.6;
-  cursor:not-allowed;
+
+opacity:.75;
+
+cursor:not-allowed;
+
 }
+
+
+.loading-spinner{
+
+display:inline-block;
+
+width:18px;
+
+height:18px;
+
+border:
+
+3px solid rgba(255,255,255,.35);
+
+border-top-color:#ffffff;
+
+border-radius:50%;
+
+vertical-align:middle;
+
+margin-right:8px;
+
+animation:
+
+spin .8s linear infinite;
+
+}
+
+
+@keyframes spin{
+
+100%{
+
+transform:rotate(360deg);
+
+}
+
+}
+
+
+button.loading{
+
+pointer-events:none;
+
+background:
+
+linear-gradient(
+
+135deg,
+
+#00d2ff,
+
+#3a7bd5
+
+);
+
+}
+
 #msg{
-    margin-top:15px;
-    text-align:center;
-    color:red;
-    font-size:14px;
+
+margin-top:15px;
+
+text-align:center;
+
+font-size:14px;
+
+color:#ff4444;
+
+text-shadow:
+
+0 0 8px rgba(255,0,0,.5);
+
 }
-@media(max-width:600px){
+
+.hud-panel{
+
+position:absolute;
+
+top:25px;
+
+left:25px;
+
+width:240px;
+
+padding:15px;
+
+background:
+
+rgba(0,255,255,.06);
+
+border-left:
+
+3px solid #00ffff;
+
+border-radius:8px;
+
+color:#00ffff;
+
+font-family:'Poppins',sans-serif;
+
+font-size:14px;
+
+line-height:26px;
+
+z-index:20;
+
+text-shadow:
+
+0 0 10px #00ffff;
+
+backdrop-filter:blur(10px);
+
+-webkit-backdrop-filter:blur(10px);
+
+animation:
+
+hudGlow 2s infinite;
+
+}
+
+
+/* HUD Animation */
+
+@keyframes hudGlow{
+
+0%,100%{
+
+opacity:1;
+
+}
+
+50%{
+
+opacity:.7;
+
+}
+
+}
+
+
+.hud-title{
+
+font-size:17px;
+
+font-weight:700;
+
+margin-bottom:10px;
+
+letter-spacing:1px;
+
+color:#ffffff;
+
+}
+
+.online{
+
+color:#00ff66;
+
+font-weight:600;
+
+text-shadow:
+
+0 0 10px #00ff66;
+
+}
+
+.cover h2{
+
+margin-top:20px;
+
+font-size:25px;
+
+color:#ffffff;
+
+letter-spacing:2px;
+
+text-shadow:
+
+0 0 15px #00ffff;
+
+}
+
+
+.cover p{
+
+margin-top:8px;
+
+color:#ffffff;
+
+font-family:'Poppins',sans-serif;
+
+font-size:15px;
+
+opacity:.85;
+
+}
+
+
+@media(max-width:768px){
+
+
 .orbit{
-width:450px;
-height:450px;
+
+width:460px;
+
+height:460px;
+
 }
+
+
 .brand{
-width:50px;
-height:50px;
-margin:-25px;
+
+width:55px;
+
+height:55px;
+
+margin:-27.5px;
+
 }
-.b1,.b2,.b3,.b4,.b5,.b6,
-.b7,.b8,.b9,.b10,.b11,.b12{
-transform:rotate(0deg) translate(200px);
+
+
+.b1,.b2,.b3,.b4,
+
+.b5,.b6,.b7,.b8,
+
+.b9,.b10,.b11,.b12{
+
+transform:
+
+rotate(0deg)
+
+translate(210px);
+
 }
+
+
+.jarvis{
+
+width:190px;
+
+height:190px;
+
+}
+
+
+.jarvis img{
+
+width:140px;
+
+height:140px;
+
+}
+
+
+.ring1{
+
+width:180px;
+
+height:180px;
+
+}
+
+
+.ring2{
+
+width:210px;
+
+height:210px;
+
+}
+
+
+.ring3{
+
+width:240px;
+
+height:240px;
+
+}
+
+
 .login-box{
-width:90%;
+
+width:92%;
+
+padding:25px;
+
 }
+
+
+.hud-panel{
+
+top:15px;
+
+left:15px;
+
+width:200px;
+
+font-size:12px;
+
+line-height:22px;
+
 }
+
+
+.hud-title{
+
+font-size:14px;
+
+}
+
+
+}
+
+
+@media(max-width:450px){
+
+
+.hud-panel{
+
+display:none;
+
+}
+
+
+.orbit{
+
+width:380px;
+
+height:380px;
+
+}
+
+
+.brand{
+
+width:45px;
+
+height:45px;
+
+margin:-22px;
+
+}
+
+
+.login-box h2{
+
+font-size:18px;
+
+}
+
+
+input{
+
+padding:12px;
+
+}
+
+
+button{
+
+padding:13px;
+
+}
+
+
+}
+
 </style>
 
 </head>
+
 <body>
-    
-<div class="orbit">
-    
-    <div class="brand b1">
-        <img src="dp.jpg" alt="DP">
-    </div>
-    <div class="brand b2">
-        <img src="kv8.jpg" alt="KV8">
-    </div>
-    <div class="brand b3">
-        <img src="heybaji.jpg" alt="HeyBaji">
-    </div>
-    <div class="brand b4">
-        <img src="jeetbangla.jpg" alt="Jeet Bangla">
-    </div>
-    <div class="brand b5">
-        <img src="jeetway.jpg" alt="Jeetway">
-    </div>
-    <div class="brand b6">
-        <img src="superbaji.jpg" alt="Super Baji">
-    </div>
-    <div class="brand b7">
-        <img src="sbj66.jpg" alt="SBJ66">
-    </div>
-    <div class="brand b8">
-        <img src="bedjdb.jpg" alt="BDJDB">
-    </div>
-    <div class="brand b9">
-        <img src="bn88.jpg" alt="BN88">
-    </div>
-    <div class="brand b10">
-        <img src="bdvegas.jpg" alt="BD Vegas">
-    </div>
-    <div class="brand b11">
-        <img src="cpc88.jpg" alt="CPC88">
-    </div>
-    <div class="brand b12">
-        <img src="deshi777.jpg" alt="Deshi777">
-    </div>
-    
+
+
+<canvas id="matrix"></canvas>
+
+<div class="hud-panel">
+
+<div class="hud-title">
+◉ S10 CORE SYSTEM
 </div>
 
+
+<div>
+STATUS:
+<span class="online">
+ONLINE
+</span>
+</div>
+
+
+<div>
+SECURITY:
+<span>
+ENCRYPTED
+</span>
+</div>
+
+
+<div>
+SERVER:
+<span>
+CONNECTED
+</span>
+</div>
+
+
+<div id="hudClock">
+
+00/00/0000 00:00:00
+
+</div>
+
+
+</div>
+
+
+<div class="orbit">
+
+
+<div class="brand b1">
+<img src="dp.jpg" alt="DP">
+</div>
+
+
+<div class="brand b2">
+<img src="kv8.jpg" alt="KV8">
+</div>
+
+
+<div class="brand b3">
+<img src="heybaji.jpg" alt="HeyBaji">
+</div>
+
+
+<div class="brand b4">
+<img src="jeetbangla.jpg" alt="Jeet Bangla">
+</div>
+
+
+<div class="brand b5">
+<img src="jeetway.jpg" alt="Jeetway">
+</div>
+
+
+<div class="brand b6">
+<img src="superbaji.jpg" alt="Super Baji">
+</div>
+
+
+<div class="brand b7">
+<img src="sbj66.jpg" alt="SBJ66">
+</div>
+
+
+<div class="brand b8">
+<img src="bedjdb.jpg" alt="BDJDB">
+</div>
+
+
+<div class="brand b9">
+<img src="bn88.jpg" alt="BN88">
+</div>
+
+
+<div class="brand b10">
+<img src="bdvegas.jpg" alt="BD Vegas">
+</div>
+
+
+<div class="brand b11">
+<img src="cpc88.jpg" alt="CPC88">
+</div>
+
+
+<div class="brand b12">
+<img src="deshi777.jpg" alt="Deshi777">
+</div>
+
+
+</div>
+
+
 <div id="cover" class="cover">
-    <div class="jarvis">
-        <div class="ring ring1"></div>
-        <div class="ring ring2"></div>
-        <div class="ring ring3"></div>
-        <img src="s10.jpg" alt="S10 Portal">
-    </div>
-    <h2>S10 Portal</h2>
-    <p>Click to Login</p>
+
+
+<div class="jarvis">
+
+
+<div class="ring ring1"></div>
+
+<div class="ring ring2"></div>
+
+<div class="ring ring3"></div>
+
+
+<img src="s10.jpg" alt="S10 Portal">
+
+
+</div>
+
+
+
+<h2>
+S10 Portal
+</h2>
+
+
+<p>
+Click to Login
+</p>
+
+
 </div>
 
 <div class="login-box" id="loginBox">
-    <h2>
-        S10 Portal Login
-    </h2>
-    <input 
-    type="text" 
-    id="username" 
-    placeholder="Username"
-    autocomplete="username">
-    <input 
-    type="password" 
-    id="password" 
-    placeholder="Password"
-    autocomplete="current-password">
-    <button id="loginBtn" onclick="login()">
-        Login
-    </button>
-    <p id="msg"></p>
+
+
+<h2>
+S10 PORTAL ACCESS
+</h2>
+
+
+
+<input
+
+type="text"
+
+id="username"
+
+placeholder="ENTER USER ID"
+
+autocomplete="username"
+
+>
+
+
+
+<input
+
+type="password"
+
+id="password"
+
+placeholder="ENTER PASSWORD"
+
+autocomplete="current-password"
+
+>
+
+
+
+<button
+
+id="loginBtn"
+
+onclick="login()"
+
+>
+
+🚀 Login
+
+</button>
+
+
+
+<p id="msg"></p>
+
+
+
 </div>
-    <script>
-// Google Apps Script API URL
+
+<script>
 
 const BASE_URL =
+
 "https://script.google.com/macros/s/AKfycbx-wNqwK7Ag1bjM2G3Yg1cwiDG45uR7R4d7NGBN2Kmb0SskZJZA-jLIUy3RbaXwbm4H/exec";
 
-const savedUser = localStorage.getItem("user");
-const savedLoginDate = localStorage.getItem("loginDate");
-const today = new Date().toLocaleDateString("en-CA");
+const savedUser =
+
+localStorage.getItem("user");
+
+
+const savedLoginDate =
+
+localStorage.getItem("loginDate");
+
+
+
+const today =
+
+new Date().toLocaleDateString("en-CA");
+
+
 
 if(savedUser && savedLoginDate === today){
-    window.location.href = "index.html";
+
+window.location.href = "index.html";
+
 }
+
 else{
-    localStorage.removeItem("user");
-    localStorage.removeItem("role");
-    localStorage.removeItem("loginDate");
+
+
+localStorage.removeItem("user");
+
+localStorage.removeItem("role");
+
+localStorage.removeItem("loginDate");
+
+
 }
 
-document.addEventListener("keydown",function(e){
-    if(e.key === "Enter"){
-        login();
-    }
-});
 
-const cover = document.getElementById("cover");
-const loginBox = document.getElementById("loginBox");
-const orbit = document.querySelector(".orbit");
+document.addEventListener(
+
+"keydown",
+
+function(e){
+
+
+if(e.key === "Enter"){
+
+login();
+
+}
+
+
+}
+
+);
+
+
+const cover =
+
+document.getElementById("cover");
+
+
+
+const loginBox =
+
+document.getElementById("loginBox");
+
+
+
+const orbit =
+
+document.querySelector(".orbit");
+
+
 cover.onclick = function(){
-    cover.style.display = "none";
-    loginBox.style.display = "block";
 
-    if(orbit){
-        orbit.style.animationPlayState = "paused";
-    }
+
+cover.style.opacity = "0";
+
+
+setTimeout(()=>{
+
+
+cover.style.display="none";
+
+
+loginBox.style.display="block";
+
+
+},400);
+
+
+
+if(orbit){
+
+orbit.style.animationPlayState="paused";
+
+}
+
+
 };
 
+
 function login(){
-    const username =
-    document.getElementById("username").value.trim();
-    const password =
-    document.getElementById("password").value.trim();
-    const msg =
-    document.getElementById("msg");
-    const btn =
-    document.getElementById("loginBtn");
-    msg.innerHTML = "";
-    if(username === "" || password === ""){
-        msg.innerHTML =
-        "Please enter Username and Password";
-        return;
-    }
-    btn.innerHTML = "Checking...";
-    btn.disabled = true;
-    fetch(BASE_URL,{
-        method:"POST",
-        headers:{
-            "Content-Type":
-            "text/plain;charset=utf-8"
-        },
-        body:JSON.stringify({
-            action:"login",
-            username:username,
-            password:password
-        })
-    })
-    .then(response=>{
-        if(!response.ok){
-            throw new Error("Server Error");
-        }
-        return response.json();
-    })
-    .then(data=>{
-        btn.innerHTML = "Login";
-        btn.disabled = false;
-        if(data.success){
-            const loginDate =
-            new Date().toLocaleDateString("en-CA");
-            localStorage.setItem(
-                "user",
-                data.username
-            );
-            localStorage.setItem(
-                "role",
-                data.role
-            );
-            localStorage.setItem(
-                "loginDate",
-                loginDate
-            );
-            window.location.href =
-            "index.html";
-        }
-        else{
-            msg.innerHTML =
-            data.message || "Invalid Login";
 
-        }
-    })
 
-    .catch(error=>{
+const username =
 
-        btn.innerHTML = "Login";
+document.getElementById("username")
+.value
+.trim();
 
-        btn.disabled = false;
 
-        msg.innerHTML =
-        "Error: " + error.message;
 
-        console.log(
-            "LOGIN ERROR:",
-            error
-        );
-    });
+const password =
+
+document.getElementById("password")
+.value
+.trim();
+
+
+
+const msg =
+
+document.getElementById("msg");
+
+
+
+const btn =
+
+document.getElementById("loginBtn");
+
+
+
+msg.innerHTML="";
+
+
+
+
+
+if(username === "" || password === ""){
+
+
+msg.innerHTML =
+
+"Please enter Username and Password";
+
+
+return;
+
+
 }
-</script>
 
+
+
+
+
+/* Loading Start */
+
+
+btn.disabled=true;
+
+
+btn.classList.add("loading");
+
+
+btn.innerHTML =
+
+`
+
+<span class="loading-spinner"></span>
+
+Authenticating...
+
+`;
+
+
+
+/* API Request */
+
+
+fetch(BASE_URL,{
+
+
+method:"POST",
+
+
+headers:{
+
+
+"Content-Type":
+
+"text/plain;charset=utf-8"
+
+
+},
+
+
+body:JSON.stringify({
+
+
+action:"login",
+
+
+username:username,
+
+
+password:password
+
+
+})
+
+
+})
+
+
+
+.then(response=>{
+
+
+if(!response.ok){
+
+
+throw new Error(
+
+"Server Connection Failed"
+
+);
+
+
+}
+
+
+return response.json();
+
+
+})
+
+
+
+.then(data=>{
+btn.disabled=false;
+btn.classList.remove("loading");
+btn.innerHTML="🚀 Login";
+
+if(data.success){
+const loginDate =
+new Date().toLocaleDateString("en-CA");
+localStorage.setItem(
+"user",
+data.username
+);
+
+localStorage.setItem(
+"role",
+data.role
+);
+
+localStorage.setItem(
+"loginDate",
+loginDate
+);
+window.location.href=
+"index.html";
+}
+else{
+msg.innerHTML =
+data.message ||
+"Invalid Username or Password";
+}
+})
+
+.catch(error=>{
+btn.disabled=false;
+btn.classList.remove("loading");
+btn.innerHTML="🚀 Login";
+msg.innerHTML =
+"Error: " + error.message;
+console.log(
+"LOGIN ERROR:",
+error
+);
+});
+}
+
+function updateHUD(){
+const clock =
+document.getElementById("hudClock");
+if(clock){
+clock.innerHTML =
+new Date().toLocaleString("en-GB");}
+}
+setInterval(updateHUD,1000);
+
+updateHUD();
+
+const canvas =
+document.getElementById("matrix");
+const ctx =
+canvas.getContext("2d");
+
+function resizeCanvas(){
+const dpr =
+window.devicePixelRatio || 1;
+canvas.width =
+window.innerWidth * dpr;
+canvas.height =
+window.innerHeight * dpr;
+canvas.style.width =
+window.innerWidth + "px";
+canvas.style.height =
+window.innerHeight + "px";
+ctx.setTransform(dpr,0,0,dpr,0,0);}
+window.addEventListener(
+"resize",
+resizeCanvas
+);
+
+resizeCanvas();
+
+const chars =
+"10SUPER10S10PORTALLOGIN";
+let columns =
+Math.floor(
+window.innerWidth / 15
+);
+let drops =
+Array(columns).fill(1);
+
+function drawMatrix(){
+ctx.fillStyle ="rgba(0,0,0,0.08)";
+ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+ctx.fillStyle="#00ffff";
+ctx.font="14px monospace";
+drops.forEach((y,i)=>{
+const text =chars[Math.floor(Math.random()*chars.length)];
+ctx.fillText(text,i*15,y*15);
+if(y*15 >window.innerHeight &&Math.random() >0.975){drops[i]=0;}
+drops[i]++;});}
+setInterval(drawMatrix,60);
+
+</script>
 </body>
 </html>
-    
