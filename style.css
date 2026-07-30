@@ -1149,3 +1149,34 @@ background:#16469d;
 color:white;
 
 }
+.clock-box{
+    position:fixed;
+
+    right:30px;
+    top:100px;
+
+    width:auto;
+    height:auto;
+
+    background:rgba(0,0,0,.5);
+    color:#00ffff;
+
+    padding:15px 25px;
+    border-radius:15px;
+
+    text-align:center;
+    font-family:pacifico;
+
+    box-shadow:
+    0 0 15px cyan;
+}
+
+#currentTime{
+    font-size:20px;
+    font-weight:bold;
+}
+
+#currentDate{
+    font-size:18px;
+    margin-top:8px;
+}
