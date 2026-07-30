@@ -75,6 +75,37 @@ function waitForDataAndRender(name) {
     }
     renderMistakes(name);
 }
+function showDateTime(){
+
+    let now = new Date();
+
+
+    let time =
+    now.getHours().toString().padStart(2,'0')
+    + ":" +
+    now.getMinutes().toString().padStart(2,'0')
+    + ":" +
+    now.getSeconds().toString().padStart(2,'0');
+
+
+    let date =
+    now.getDate().toString().padStart(2,'0')
+    + "/" +
+    (now.getMonth()+1).toString().padStart(2,'0')
+    + "/" +
+    now.getFullYear();
+
+
+    document.getElementById("currentTime").innerHTML=time;
+
+    document.getElementById("currentDate").innerHTML=date;
+
+}
+
+
+setInterval(showDateTime,1000);
+
+showDateTime();
 
 // ==============================
 // LOAD DATA
