@@ -41,6 +41,11 @@ rel="stylesheet">
 
 <style>
 
+/* ==========================================
+   S10 PORTAL LOGIN
+   FINAL v2.0
+========================================== */
+
 *{
 
 margin:0;
@@ -101,6 +106,9 @@ user-select:none;
 
 }
 
+/* ===============================
+   MATRIX BACKGROUND
+================================ */
 
 #matrix{
 
@@ -119,6 +127,10 @@ pointer-events:none;
 z-index:0;
 
 }
+
+/* ===============================
+   ORBIT
+================================ */
 
 .orbit{
 
@@ -167,6 +179,10 @@ rotate(360deg);
 }
 
 }
+
+/* ==========================================
+   BRAND ICON
+========================================== */
 
 .brand{
 
@@ -222,6 +238,9 @@ box-shadow:
 
 }
 
+/* ==========================================
+   BRAND ROTATION
+========================================== */
 
 @keyframes brandRotate{
 
@@ -239,6 +258,9 @@ transform:rotate(-360deg);
 
 }
 
+/* ==========================================
+   GLOW EFFECT
+========================================== */
 
 @keyframes glow{
 
@@ -270,6 +292,10 @@ filter:brightness(1.3);
 
 }
 
+/* ==========================================
+   ORBIT POSITION
+========================================== */
+
 .b1{transform:rotate(330deg) translate(300px) rotate(-330deg);}
 .b2{transform:rotate(300deg) translate(300px) rotate(-300deg);}
 .b3{transform:rotate(270deg) translate(300px) rotate(-270deg);}
@@ -282,6 +308,10 @@ filter:brightness(1.3);
 .b10{transform:rotate(60deg) translate(300px) rotate(-60deg);}
 .b11{transform:rotate(30deg) translate(300px) rotate(-30deg);}
 .b12{transform:rotate(0deg) translate(300px) rotate(0deg);}
+
+/* ==========================================
+   COVER SCREEN
+========================================== */
 
 .cover{
 
@@ -304,6 +334,9 @@ z-index:5;
 transition:.4s;
 
 }
+/* ==========================================
+   JARVIS CORE
+========================================== */
 
 .jarvis{
 
@@ -359,6 +392,10 @@ box-shadow:
 
 }
 
+/* ==========================================
+   RINGS
+========================================== */
+
 .ring{
 
 position:absolute;
@@ -411,6 +448,10 @@ animation:ringRotate 14s linear infinite;
 
 }
 
+/* ==========================================
+   RING ANIMATION
+========================================== */
+
 @keyframes ringRotate{
 
 from{
@@ -442,6 +483,10 @@ transform:rotate(0deg);
 }
 
 }
+
+/* ==========================================
+   LOGIN BOX
+========================================== */
 
 .login-box{
 
@@ -521,6 +566,36 @@ text-shadow:
 
 }
 
+.input-box{
+    position:relative;
+    margin-bottom:16px;
+}
+
+.input-box input{
+    width:100%;
+    padding-right:50px;
+    margin-bottom:0;
+}
+
+.right-icon{
+    position:absolute;
+    right:15px;
+    top:50%;
+    transform:translateY(-50%);
+    cursor:pointer;
+    color:#00ffff;
+    font-size:18px;
+    transition:.3s;
+}
+
+.right-icon:hover{
+    color:#ffffff;
+}
+/* ==========================================
+   INPUT FIELD
+========================================== */
+
+
 input{
 
 width:100%;
@@ -566,6 +641,12 @@ box-shadow:
 0 0 15px rgba(0,255,255,.5);
 
 }
+
+
+/* ==========================================
+   LOGIN BUTTON
+========================================== */
+
 
 button{
 
@@ -635,6 +716,11 @@ cursor:not-allowed;
 }
 
 
+/* ==========================================
+   LOADING SPINNER
+========================================== */
+
+
 .loading-spinner{
 
 display:inline-block;
@@ -691,6 +777,12 @@ linear-gradient(
 
 }
 
+
+/* ==========================================
+   MESSAGE BOX
+========================================== */
+
+
 #msg{
 
 margin-top:15px;
@@ -706,6 +798,10 @@ text-shadow:
 0 0 8px rgba(255,0,0,.5);
 
 }
+
+/* ==========================================
+   LEFT AI HUD PANEL
+========================================== */
 
 .hud-panel{
 
@@ -773,6 +869,11 @@ opacity:.7;
 }
 
 
+/* ==========================================
+   HUD TITLE
+========================================== */
+
+
 .hud-title{
 
 font-size:17px;
@@ -787,6 +888,12 @@ color:#ffffff;
 
 }
 
+
+/* ==========================================
+   ONLINE STATUS
+========================================== */
+
+
 .online{
 
 color:#00ff66;
@@ -798,6 +905,12 @@ text-shadow:
 0 0 10px #00ff66;
 
 }
+
+
+/* ==========================================
+   COVER TEXT
+========================================== */
+
 
 .cover h2{
 
@@ -829,6 +942,11 @@ font-size:15px;
 opacity:.85;
 
 }
+
+
+/* ==========================================
+   MOBILE RESPONSIVE
+========================================== */
 
 
 @media(max-width:768px){
@@ -948,6 +1066,11 @@ font-size:14px;
 }
 
 
+/* ==========================================
+   SMALL MOBILE
+========================================== */
+
+
 @media(max-width:450px){
 
 
@@ -1008,7 +1131,18 @@ padding:13px;
 <body>
 
 
+<!-- ==========================================
+     MATRIX BACKGROUND
+========================================== -->
+
 <canvas id="matrix"></canvas>
+
+
+
+<!-- ==========================================
+     AI HUD PANEL
+========================================== -->
+
 
 <div class="hud-panel">
 
@@ -1049,6 +1183,14 @@ CONNECTED
 
 
 </div>
+
+
+
+
+
+<!-- ==========================================
+     BRAND ORBIT SYSTEM
+========================================== -->
 
 
 <div class="orbit">
@@ -1117,6 +1259,14 @@ CONNECTED
 </div>
 
 
+
+
+
+<!-- ==========================================
+     LOGIN COVER SCREEN
+========================================== -->
+
+
 <div id="cover" class="cover">
 
 
@@ -1149,68 +1299,74 @@ Click to Login
 
 </div>
 
+
+
+
+
+<!-- ==========================================
+     LOGIN BOX
+========================================== -->
+
+
 <div class="login-box" id="loginBox">
 
+    <h2>S10 PORTAL ACCESS</h2>
 
-<h2>
-S10 PORTAL ACCESS
-</h2>
+    <div class="input-box">
+        <input
+            type="text"
+            id="username"
+            placeholder="ENTER USER ID"
+            autocomplete="username">
+    </div>
 
+    <div class="input-box">
+        <input
+            type="password"
+            id="password"
+            placeholder="ENTER PASSWORD"
+            autocomplete="current-password">
 
+        <span class="right-icon"
+              id="togglePassword"
+              onclick="togglePassword()">
+            👁
+        </span>
+    </div>
 
-<input
+    <button id="loginBtn" onclick="login()">
+        🚀 Login
+    </button>
 
-type="text"
-
-id="username"
-
-placeholder="ENTER USER ID"
-
-autocomplete="username"
-
->
-
-
-
-<input
-
-type="password"
-
-id="password"
-
-placeholder="ENTER PASSWORD"
-
-autocomplete="current-password"
-
->
-
-
-
-<button
-
-id="loginBtn"
-
-onclick="login()"
-
->
-
-🚀 Login
-
-</button>
-
-
-
-<p id="msg"></p>
-
-
+    <p id="msg"></p>
 
 </div>
 
 <script>
 
+/* ==========================================
+   S10 PORTAL FINAL v2.0
+   JAVASCRIPT SYSTEM
+========================================== */
+
+
+/* ==========================================
+   GOOGLE APPS SCRIPT API
+========================================== */
+
+
 const BASE_URL =
 
 "https://script.google.com/macros/s/AKfycbx31jncpfY0-7OGNwiBIk_oEWVx7hJGi2ce7cX41L1mbMhUeyjPu-IOBwvTPIHb24IXtg/exec";
+
+
+
+
+
+/* ==========================================
+   AUTO LOGIN CHECK
+========================================== */
+
 
 const savedUser =
 
@@ -1247,6 +1403,29 @@ localStorage.removeItem("loginDate");
 
 }
 
+function togglePassword(){
+
+    const password = document.getElementById("password");
+    const eye = document.getElementById("togglePassword");
+
+    if(password.type === "password"){
+        password.type = "text";
+        eye.innerHTML = "🙈";
+    }else{
+        password.type = "password";
+        eye.innerHTML = "👁";
+    }
+
+}
+
+
+
+
+
+/* ==========================================
+   ENTER KEY LOGIN
+========================================== */
+
 
 document.addEventListener(
 
@@ -1267,6 +1446,17 @@ login();
 );
 
 
+
+
+
+
+
+
+/* ==========================================
+   COVER TO LOGIN ANIMATION
+========================================== */
+
+
 const cover =
 
 document.getElementById("cover");
@@ -1282,6 +1472,9 @@ document.getElementById("loginBox");
 const orbit =
 
 document.querySelector(".orbit");
+
+
+
 
 
 cover.onclick = function(){
@@ -1311,6 +1504,16 @@ orbit.style.animationPlayState="paused";
 
 
 };
+
+
+
+
+
+
+
+/* ==========================================
+   LOGIN FUNCTION
+========================================== */
 
 
 function login(){
@@ -1391,38 +1594,24 @@ Authenticating...
 /* API Request */
 
 
+const controller = new AbortController();
+
+setTimeout(()=>{
+    controller.abort();
+},10000);
+
+
 fetch(BASE_URL,{
-
-
-method:"POST",
-
-
-headers:{
-
-
-"Content-Type":
-
-"text/plain;charset=utf-8"
-
-
-},
-
-
-body:JSON.stringify({
-
-
-action:"login",
-
-
-username:username,
-
-
-password:password
-
-
-})
-
-
+    method:"POST",
+    signal: controller.signal,
+    headers:{
+        "Content-Type":"text/plain;charset=utf-8"
+    },
+    body:JSON.stringify({
+        action:"login",
+        username:username,
+        password:password
+    })
 })
 
 
@@ -1451,106 +1640,404 @@ return response.json();
 
 
 .then(data=>{
+
+
 btn.disabled=false;
+
+
 btn.classList.remove("loading");
+
+
 btn.innerHTML="🚀 Login";
+
+
 
 if(data.success){
+
+
 const loginDate =
+
 new Date().toLocaleDateString("en-CA");
+
+
+
 localStorage.setItem(
+
 "user",
+
 data.username
+
 );
 
+
+
 localStorage.setItem(
+
 "role",
+
 data.role
+
 );
 
+
+
 localStorage.setItem(
+
 "loginDate",
+
 loginDate
+
 );
+
+
+
 window.location.href=
+
 "index.html";
+
+
+
 }
+
 else{
+
+
 msg.innerHTML =
+
 data.message ||
+
 "Invalid Username or Password";
+
+
 }
+
+
+
 })
 
+
+/* ==========================================
+   LOGIN ERROR HANDLING
+========================================== */
+
+
 .catch(error=>{
+
+
 btn.disabled=false;
+
+
 btn.classList.remove("loading");
+
+
 btn.innerHTML="🚀 Login";
+
+
+
 msg.innerHTML =
+
 "Error: " + error.message;
+
+
+
 console.log(
+
 "LOGIN ERROR:",
+
 error
+
 );
+
+
+
 });
+
+
+
 }
 
+
+
+
+
+/* ==========================================
+   HUD CLOCK SYSTEM
+========================================== */
+
+
 function updateHUD(){
+
+
 const clock =
+
 document.getElementById("hudClock");
+
+
+
 if(clock){
+
+
 clock.innerHTML =
-new Date().toLocaleString("en-GB");}
+
+new Date().toLocaleString("en-GB");
+
+
 }
-setInterval(updateHUD,1000);
+
+
+}
+
+
+
+setInterval(
+
+updateHUD,
+
+1000
+
+);
+
 
 updateHUD();
 
+
+
+
+
+
+/* ==========================================
+   MATRIX RAIN EFFECT
+========================================== */
+
+
 const canvas =
+
 document.getElementById("matrix");
+
+
+
 const ctx =
+
 canvas.getContext("2d");
 
+
+
+
 function resizeCanvas(){
+
+
 const dpr =
+
 window.devicePixelRatio || 1;
+
+
+
 canvas.width =
+
 window.innerWidth * dpr;
+
+
+
 canvas.height =
+
 window.innerHeight * dpr;
+
+
+
 canvas.style.width =
+
 window.innerWidth + "px";
+
+
+
 canvas.style.height =
+
 window.innerHeight + "px";
-ctx.setTransform(dpr,0,0,dpr,0,0);}
-window.addEventListener(
-"resize",
-resizeCanvas
+
+
+
+ctx.setTransform(
+
+dpr,
+
+0,
+
+0,
+
+dpr,
+
+0,
+
+0
+
 );
+
+
+}
+
+
+
+window.addEventListener(
+
+"resize",
+
+resizeCanvas
+
+);
+
+
 
 resizeCanvas();
 
+
+
+
+
+
+
+/* Matrix Characters */
+
+
 const chars =
+
 "10SUPER10S10PORTALLOGIN";
+
+
+
 let columns =
+
 Math.floor(
+
 window.innerWidth / 15
+
 );
+
+
+
 let drops =
+
 Array(columns).fill(1);
 
+
+
+
+
+
 function drawMatrix(){
-ctx.fillStyle ="rgba(0,0,0,0.08)";
-ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+
+
+ctx.fillStyle =
+
+"rgba(0,0,0,0.08)";
+
+
+
+ctx.fillRect(
+
+0,
+
+0,
+
+window.innerWidth,
+
+window.innerHeight
+
+);
+
+
+
+
 ctx.fillStyle="#00ffff";
+
+
 ctx.font="14px monospace";
+
+
+
+
 drops.forEach((y,i)=>{
-const text =chars[Math.floor(Math.random()*chars.length)];
-ctx.fillText(text,i*15,y*15);
-if(y*15 >window.innerHeight &&Math.random() >0.975){drops[i]=0;}
-drops[i]++;});}
-setInterval(drawMatrix,60);
+
+
+
+const text =
+
+chars[
+
+Math.floor(
+
+Math.random()*chars.length
+
+)
+
+];
+
+
+
+ctx.fillText(
+
+text,
+
+i*15,
+
+y*15
+
+);
+
+
+
+
+if(
+
+y*15 >
+
+window.innerHeight &&
+
+Math.random() >
+
+0.975
+
+){
+
+
+drops[i]=0;
+
+
+}
+
+
+
+drops[i]++;
+
+
+
+});
+
+
+}
+
+
+
+setInterval(
+
+drawMatrix,
+
+60
+
+);
+
+
+
+
+
+/* ==========================================
+   FINAL SCRIPT END
+========================================== */
+
 
 </script>
+
+
 </body>
+
+
 </html>
