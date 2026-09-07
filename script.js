@@ -499,10 +499,9 @@ renderMistakeOverview();
 // ==============================
 
 
-setInterval(
-    loadData,
-    10000
-);
+function manualRefresh() {
+    loadData();
+}
 
 // ==============================
 // SCRIPT.JS PART 2
