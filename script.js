@@ -1,737 +1,575 @@
 // ==============================
-// SCRIPT.JS PART 1
-// LOGIN + CONFIG + GLOBAL + DATE + CLOCK + LOAD DATA
+// SCRIPT.JS
+// S10 PORTAL
+// COMPLETE CORRECTED VERSION
 // ==============================
 
 
 // ==============================
-// LOGIN CHECK
+// LOGIN + CONFIG + GLOBAL
 // ==============================
 
 const user = localStorage.getItem("user");
-
 const loginDate = localStorage.getItem("loginDate");
-
 const today = new Date().toLocaleDateString("en-CA");
 
-
 if (!user || loginDate !== today) {
-
     localStorage.clear();
-
     window.location.replace("login.html");
-
 }
 
-
-
-// ==============================
-// GOOGLE APPS SCRIPT URL
-// ==============================
 
 const BASE_URL =
 "https://script.google.com/macros/s/AKfycbxonOHaQLRfW_5Uw0yjQFxp0r2AB1ElqyycwsvqeS5FRZ1KrNqaGjhqFqhqlvqz864/exec";
 
 
-
-// ==============================
-// GLOBAL VARIABLES
-// ==============================
-
 let employees = [];
-
 let filteredEmployees = [];
-
 let allData = [];
-
 let Report = [];
-
 let allLinks = [];
 
 let dataReady = false;
-
 let firstLoad = true;
 
-
+let mistakeOverviewChart = null;
 
 
 // ==============================
 // DATE PARSER
 // ==============================
 
-function parseDate(value){
+function parseDate(value) {
 
+    if (!value) return null;
 
-    if(!value) return null;
-
-
-
-    if(value instanceof Date){
-
-        return isNaN(value.getTime())
-        ? null
-        : value;
-
+    if (value instanceof Date) {
+        return isNaN(value.getTime()) ? null : value;
     }
 
+    if (typeof value === "number") {
 
+        const date = new Date(
+            Math.round(
+                (value - 25569) *
+                86400 *
+                1000
+            )
+        );
 
-    if(
+        return isNaN(date.getTime())
+            ? null
+            : date;
+    }
+
+    if (
         typeof value === "string" &&
         value.includes("/")
-    ){
+    ) {
 
         const parts = value.split("/");
 
+        if (parts.length === 3) {
 
-        if(parts.length === 3){
+            const first = Number(parts[0]);
+            const second = Number(parts[1]);
+            const year = Number(parts[2]);
 
+            /*
+             * Handles:
+             * MM/DD/YYYY
+             * DD/MM/YYYY
+             */
 
-            const month = parts[0];
+            if (first > 12) {
 
-            const day = parts[1];
+                const date =
+                    new Date(
+                        year,
+                        second - 1,
+                        first
+                    );
 
-            const year = parts[2];
+                return isNaN(date.getTime())
+                    ? null
+                    : date;
+            }
 
+            const date =
+                new Date(
+                    year,
+                    first - 1,
+                    second
+                );
 
-
-            return new Date(
-                `${year}-${month}-${day}`
-            );
-
+            return isNaN(date.getTime())
+                ? null
+                : date;
         }
-
     }
-
-
 
     const d = new Date(value);
 
-
     return isNaN(d.getTime())
-    ? null
-    : d;
-
-
+        ? null
+        : d;
 }
-
-
 
 
 // ==============================
 // WAIT FOR DATA
 // ==============================
 
-function waitForDataAndRender(name){
+function waitForDataAndRender(name) {
 
+    if (!dataReady) {
 
-    if(!dataReady){
-
-
-        setTimeout(()=>{
+        setTimeout(() => {
 
             waitForDataAndRender(name);
 
-        },300);
-
+        }, 300);
 
         return;
-
     }
 
-
     renderMistakes(name);
-
-
 }
 
 
-
-
-
 // ==============================
-// LIVE CLOCK
+// DATE + TIME
 // ==============================
 
-
-function showDateTime(){
-
+function showDateTime() {
 
     const now = new Date();
 
-
-
     const time =
-
-    now.getHours()
-    .toString()
-    .padStart(2,"0")
-
-    + ":" +
-
-    now.getMinutes()
-    .toString()
-    .padStart(2,"0")
-
-    + ":" +
-
-    now.getSeconds()
-    .toString()
-    .padStart(2,"0");
-
-
-
+        now.getHours().toString().padStart(2, "0") +
+        ":" +
+        now.getMinutes().toString().padStart(2, "0") +
+        ":" +
+        now.getSeconds().toString().padStart(2, "0");
 
     const date =
-
-    now.getDate()
-    .toString()
-    .padStart(2,"0")
-
-    + "/" +
-
-    (now.getMonth()+1)
-    .toString()
-    .padStart(2,"0")
-
-    + "/" +
-
-    now.getFullYear();
-
-
-
+        now.getDate().toString().padStart(2, "0") +
+        "/" +
+        (now.getMonth() + 1)
+            .toString()
+            .padStart(2, "0") +
+        "/" +
+        now.getFullYear();
 
     const timeBox =
-    document.getElementById("currentTime");
-
+        document.getElementById("currentTime");
 
     const dateBox =
-    document.getElementById("currentDate");
+        document.getElementById("currentDate");
 
-
-
-    if(timeBox){
-
+    if (timeBox) {
         timeBox.innerHTML = time;
-
     }
 
-
-
-    if(dateBox){
-
+    if (dateBox) {
         dateBox.innerHTML = date;
-
     }
-
-
 }
 
 
-
-setInterval(
-    showDateTime,
-    1000
-);
-
+setInterval(showDateTime, 1000);
 
 showDateTime();
 
 
-
-
-
 // ==============================
-// DOM LOAD
+// LOAD DATA
 // ==============================
-
 
 document.addEventListener(
-"DOMContentLoaded",
-()=>{
+    "DOMContentLoaded",
+    () => {
 
-    loadData();
-
-});
-
-
-
-
-
-
-// ==============================
-// LOAD ALL DATA
-// ==============================
-
-
-function loadData(){
-
-
-
-Promise.all([
-
-
-    fetch(BASE_URL+"?type=employee")
-    .then(r=>r.json()),
-
-
-
-    fetch(BASE_URL+"?type=links")
-    .then(r=>r.json()),
-
-
-
-    fetch(BASE_URL+"?type=mistake")
-    .then(r=>r.json()),
-
-
-
-    fetch(BASE_URL+"?type=report")
-    .then(r=>r.json())
-
-
-])
-
-
-
-.then(([employeeData,linksData,mistakeData,reportData])=>{
-
-
-
-    employees =
-    employeeData || [];
-
-
-
-    filteredEmployees =
-    employeeData || [];
-
-
-
-    allLinks =
-    linksData || [];
-
-
-
-    allData =
-    Array.isArray(mistakeData)
-    ?
-    mistakeData
-    :
-    [];
-
-
-
-    Report =
-    Array.isArray(reportData)
-    ?
-    reportData
-    :
-    [];
-
-
-
-    dataReady = true;
-
-
-
-
-    const monthFilter =
-    document.getElementById("monthFilter");
-
-
-
-    if(
-        monthFilter &&
-        monthFilter.options.length <= 1
-    ){
-
-        loadMonthFilter();
+        loadData();
 
     }
-
-loadCSNameFilter();
-loadOverviewCSFilter();
-renderMistakeOverview();
-
-    if(firstLoad){
+);
 
 
+function loadData() {
 
-        renderLinks(
-            "BO",
-            "boLinks"
-        );
+    Promise.all([
 
+        fetch(
+            BASE_URL + "?type=employee"
+        ).then(r => r.json()),
 
-        renderLinks(
-            "Website Link",
-            "wbLinks"
-        );
+        fetch(
+            BASE_URL + "?type=links"
+        ).then(r => r.json()),
 
+        fetch(
+            BASE_URL + "?type=mistake"
+        ).then(r => r.json()),
 
-        renderLinks(
-            "Chat Link",
-            "ctLinks"
-        );
+        fetch(
+            BASE_URL + "?type=report"
+        ).then(r => r.json())
 
+    ])
 
-        renderLinks(
-            "Deposit PLY",
-            "depositPlyLinks"
-        );
+    .then(
+        ([
+            employeeData,
+            linksData,
+            mistakeData,
+            reportData
+        ]) => {
 
+            employees =
+                employeeData || [];
 
-        renderLinks(
-            "Deposit Sheet",
-            "depositSheetLinks"
-        );
+            filteredEmployees =
+                employeeData || [];
 
+            allLinks =
+                linksData || [];
 
-        renderLinks(
-            "SOP",
-            "sopLinks"
-        );
+            allData =
+                Array.isArray(mistakeData)
+                    ? mistakeData
+                    : [];
 
+            Report =
+                Array.isArray(reportData)
+                    ? reportData
+                    : [];
 
-        renderLinks(
-            "Sports BO",
-            "sportsBoLinks"
-        );
-
-
-        renderLinks(
-            "Sports",
-            "sportsGameLinks"
-        );
-
-
-        renderLinks(
-            "Other",
-            "otherLinks"
-        );
+            dataReady = true;
 
 
+            // ==============================
+            // REPORT MONTH FILTER
+            // ==============================
+
+            const monthFilter =
+                document.getElementById(
+                    "monthFilter"
+                );
+
+            if (
+                monthFilter &&
+                monthFilter.options.length <= 1
+            ) {
+
+                loadMonthFilter();
+
+            }
 
 
-        if(employees.length > 0){
+            // ==============================
+            // CS FILTERS
+            // ==============================
+
+            loadCSNameFilter();
+
+            loadOverviewCSFilter();
 
 
-            showEmployeeByObject(
-                employees[0]
-            );
+            // ==============================
+            // OVERVIEW YEAR + MONTH
+            // ==============================
 
+            loadOverviewYearFilter();
+
+            loadOverviewMonthFilter();
+
+
+            // ==============================
+            // MISTAKE OVERVIEW
+            // ==============================
+
+            renderMistakeOverview();
+
+
+            // ==============================
+            // FIRST LOAD
+            // ==============================
+
+            if (firstLoad) {
+
+                renderLinks(
+                    "BO",
+                    "boLinks"
+                );
+
+                renderLinks(
+                    "Website Link",
+                    "wbLinks"
+                );
+
+                renderLinks(
+                    "Chat Link",
+                    "ctLinks"
+                );
+
+                renderLinks(
+                    "Deposit PLY",
+                    "depositPlyLinks"
+                );
+
+                renderLinks(
+                    "Deposit Sheet",
+                    "depositSheetLinks"
+                );
+
+                renderLinks(
+                    "SOP",
+                    "sopLinks"
+                );
+
+                renderLinks(
+                    "Sports BO",
+                    "sportsBoLinks"
+                );
+
+                renderLinks(
+                    "Sports",
+                    "sportsGameLinks"
+                );
+
+                renderLinks(
+                    "Other",
+                    "otherLinks"
+                );
+
+
+                if (employees.length > 0) {
+
+                    showEmployeeByObject(
+                        employees[0]
+                    );
+
+                }
+
+                firstLoad = false;
+            }
+
+
+            // ==============================
+            // CURRENT EMPLOYEE MISTAKES
+            // ==============================
+
+            const empName =
+                document.getElementById(
+                    "empName"
+                )?.innerText;
+
+            if (
+                empName &&
+                empName !== "Select Employee"
+            ) {
+
+                renderMistakes(empName);
+
+            }
+
+
+            // ==============================
+            // REPORT PAGE
+            // ==============================
+
+            const reportPage =
+                document.getElementById(
+                    "reportPage"
+                );
+
+            if (
+                reportPage &&
+                reportPage.style.display !== "none"
+            ) {
+
+                renderAllMistakes();
+
+            }
+
+
+            // ==============================
+            // PERFORMANCE SUMMARY
+            // ==============================
+
+            renderMistakePerformanceSummary();
 
         }
+    )
 
+    .catch(error => {
 
+        console.error(
+            "Data Load Error:",
+            error
+        );
 
-        firstLoad = false;
-
-
-    }
-
-
-
-
-
-    const empName =
-    document.getElementById("empName")
-    ?.innerText;
-
-
-
-
-    if(
-        empName &&
-        empName !== "Select Employee"
-    ){
-
-        renderMistakes(empName);
-
-    }
-
-
-
-
-
-    const reportPage =
-    document.getElementById("reportPage");
-
-
-
-    if(
-        reportPage &&
-        reportPage.style.display !== "none"
-    ){
-
-        renderAllMistakes();
-
-    }
-
-
-
-})
-
-
-
-.catch(error=>{
-
-
-    console.error(
-        "Data Load Error:",
-        error
-    );
-
-
-});
-
-
-
+    });
 }
 
 
-
-
-
 // ==============================
-// AUTO REFRESH
+// MANUAL REFRESH
 // ==============================
-
 
 function manualRefresh() {
-    loadData();
-}
 
-// ==============================
-// SCRIPT.JS PART 2
-// EMPLOYEE LIST + SEARCH + PROFILE + BRAND CARD
-// ==============================
+    loadData();
+
+}
 
 
 // ==============================
 // EMPLOYEE LIST
 // ==============================
 
-function renderEmployeeList(list){
-
+function renderEmployeeList(list) {
 
     const container =
-    document.getElementById("employeeList");
+        document.getElementById(
+            "employeeList"
+        );
 
-
-    if(!container) return;
-
-
+    if (!container) return;
 
     container.innerHTML = "";
 
-
-
-    list.forEach(emp=>{
-
+    list.forEach(emp => {
 
         const card =
-        document.createElement("div");
-
-
+            document.createElement("div");
 
         card.className = "employee";
 
-
-
         card.innerHTML = `
+            <h4>
+                ${emp["CS Name"] || "-"}
+            </h4>
 
-        <h4>
-        ${emp["CS Name"] || "-"}
-        </h4>
-
-        <p>
-        ${emp["STAFF Position"] || "-"}
-        </p>
-
+            <p>
+                ${emp["STAFF Position"] || "-"}
+            </p>
         `;
 
-
-
-        card.onclick = ()=>{
-
+        card.onclick = () => {
 
             showEmployeeByObject(emp);
 
-
-
             const search =
-            document.getElementById("search");
+                document.getElementById(
+                    "search"
+                );
 
-
-            if(search){
+            if (search) {
 
                 search.value =
-                emp["CS Name"] || "";
+                    emp["CS Name"] || "";
 
             }
-
-
 
             container.innerHTML = "";
 
-
         };
-
-
 
         container.appendChild(card);
 
-
     });
-
-
 }
 
 
-
-
-
-
-
 // ==============================
-// SEARCH
+// EMPLOYEE SEARCH
 // ==============================
-
 
 document.addEventListener(
-"DOMContentLoaded",
-()=>{
+    "DOMContentLoaded",
+    () => {
 
-
-    const searchBox =
-    document.getElementById("search");
-
-
-
-    if(searchBox){
-
-
-
-        searchBox.addEventListener(
-        "keyup",
-        function(){
-
-
-
-            const txt =
-            this.value
-            .trim()
-            .toLowerCase();
-
-
-
-
-
-            const list =
+        const searchBox =
             document.getElementById(
-            "employeeList"
+                "search"
             );
 
+        if (searchBox) {
 
+            searchBox.addEventListener(
+                "keyup",
+                function () {
 
-            if(!txt){
+                    const txt =
+                        this.value
+                            .trim()
+                            .toLowerCase();
 
+                    const list =
+                        document.getElementById(
+                            "employeeList"
+                        );
 
-                if(list){
+                    if (!txt) {
 
-                    list.innerHTML = "";
+                        if (list) {
+                            list.innerHTML = "";
+                        }
+
+                        return;
+                    }
+
+                    const filtered =
+                        employees.filter(
+                            emp =>
+                                String(
+                                    emp["CS Name"] || ""
+                                )
+                                .toLowerCase()
+                                .includes(txt)
+                        );
+
+                    renderEmployeeList(
+                        filtered
+                    );
 
                 }
-
-
-                return;
-
-            }
-
-
-
-
-
-
-            const filtered =
-            employees.filter(emp=>
-
-
-
-                String(
-                    emp["CS Name"] || ""
-                )
-                .toLowerCase()
-                .includes(txt)
-
-
-
             );
-
-
-
-            renderEmployeeList(filtered);
-
-
-
-        });
-
-
-
-    }
-
-
-
-});
-
-
-
-
-
-
-
-// ==============================
-// SHOW EMPLOYEE PROFILE
-// ==============================
-
-
-function showEmployeeByObject(
-emp,
-showReport = true
-){
-
-
-
-    if(!emp) return;
-
-
-
-
-
-    const setText =
-    (id,value)=>{
-
-
-        const el =
-        document.getElementById(id);
-
-
-
-        if(el){
-
-            el.innerText =
-            value || "-";
 
         }
 
-
-    };
-
-
+    }
+);
 
 
+// ==============================
+// SHOW EMPLOYEE
+// ==============================
+
+function showEmployeeByObject(
+    emp,
+    showReport = true
+) {
+
+    if (!emp) return;
+
+
+    const setText =
+        (id, value) => {
+
+            const el =
+                document.getElementById(id);
+
+            if (el) {
+
+                el.innerText =
+                    value || "-";
+
+            }
+
+        };
 
 
     setText(
@@ -739,53 +577,37 @@ showReport = true
         emp["CS Name"]
     );
 
-
-
     setText(
         "empPosition",
         emp["STAFF Position"]
     );
-
-
 
     setText(
         "psd",
         emp["PSD ID"]
     );
 
-
-
     setText(
         "office",
-        emp["Office Location"]
-        ||
-        emp["Office Locaton"]
-        ||
+        emp["Office Location"] ||
+        emp["Office Locaton"] ||
         "-"
     );
-
-
 
     setText(
         "teamid",
         emp["STAFF MS Team ID"]
     );
 
-
-
     setText(
         "agent",
         emp["ICX Agent"]
     );
 
-
-
     setText(
         "group",
         emp["Group"]
     );
-
-
 
     setText(
         "mistake",
@@ -793,168 +615,114 @@ showReport = true
     );
 
 
-
-
-
-
     const search =
-    document.getElementById("search");
+        document.getElementById(
+            "search"
+        );
 
-
-
-    if(search){
+    if (search) {
 
         search.value =
-        emp["CS Name"] || "";
+            emp["CS Name"] || "";
 
     }
 
 
-
-
-
-
     const list =
-    document.getElementById(
-        "employeeList"
-    );
+        document.getElementById(
+            "employeeList"
+        );
 
-
-
-    if(list){
+    if (list) {
 
         list.innerHTML = "";
 
     }
 
 
-
-
-
-
-    // ==============================
-    // AVATAR
-    // ==============================
-
-
     const avatar =
-    document.getElementById("avatar");
+        document.getElementById(
+            "avatar"
+        );
 
-
-
-    if(avatar){
-
-
+    if (avatar) {
 
         const name =
-        String(
-            emp["CS Name"] || ""
-        )
-        .trim();
-
-
-
+            String(
+                emp["CS Name"] || ""
+            ).trim();
 
         avatar.innerText =
-
-        name
-
-        ?
-
-        name.charAt(0)
-        .toUpperCase()
-
-        :
-
-        "?";
-
-
+            name
+                ? name.charAt(0).toUpperCase()
+                : "?";
 
     }
 
 
-
-
-
-
-
-
     // ==============================
-    // BRAND ACCESS
+    // BRANDS
     // ==============================
-
 
     setBrand(
         "superbo",
         emp["Super BO"]
     );
 
-
     setBrand(
         "dp",
         emp["DP"]
     );
-
 
     setBrand(
         "kv",
         emp["KV"]
     );
 
-
     setBrand(
         "hb",
         emp["HB"]
     );
-
 
     setBrand(
         "jb",
         emp["JB"]
     );
 
-
     setBrand(
         "jway",
         emp["JWAY"]
     );
-
 
     setBrand(
         "sb",
         emp["SB"]
     );
 
-
     setBrand(
         "slb",
         emp["SLB"]
     );
-
 
     setBrand(
         "bjdb",
         emp["BJDB"]
     );
 
-
     setBrand(
         "bn",
         emp["BN"]
     );
-
 
     setBrand(
         "bdvegas",
         emp["BDVegas"]
     );
 
-
     setBrand(
         "cpc88",
         emp["CPC88"]
     );
-
 
     setBrand(
         "deshi777",
@@ -962,151 +730,81 @@ showReport = true
     );
 
 
-
-
-
-
-
-    if(showReport){
-
+    if (showReport) {
 
         renderMistakes(
             emp["CS Name"]
         );
 
-
     }
-
-
-
 
 }
 
 
-
-
-
-
-
 // ==============================
-// BRAND CARD
+// BRAND
 // ==============================
 
-
-function setBrand(id,value){
-
-
+function setBrand(id, value) {
 
     const box =
-    document.getElementById(id);
+        document.getElementById(id);
 
-
-
-    if(!box) return;
-
-
-
-
+    if (!box) return;
 
     const title =
-    box.dataset?.title || "";
+        box.dataset?.title || "";
 
-
-
-
-
-
-    if(
+    if (
         value &&
         String(value).trim() !== ""
-    ){
-
-
+    ) {
 
         box.className =
-        "brand-card active-brand";
-
-
+            "brand-card active-brand";
 
         box.innerHTML = `
+            <div class="brand-name">
+                ${title}
+            </div>
 
-
-        <div class="brand-name">
-
-        ${title}
-
-        </div>
-
-
-
-        <div class="brand-value">
-
-        ${value}
-
-        </div>
-
-
+            <div class="brand-value">
+                ${value}
+            </div>
         `;
 
-
-
-    }
-
-    else{
-
-
+    } else {
 
         box.className =
-        "brand-card inactive-brand";
-
-
+            "brand-card inactive-brand";
 
         box.innerHTML = `
+            <div class="brand-name">
+                ${title}
+            </div>
 
-
-        <div class="brand-name">
-
-        ${title}
-
-        </div>
-
-
-
-        <div class="brand-value">
-
-        No Access
-
-        </div>
-
-
+            <div class="brand-value">
+                No Access
+            </div>
         `;
 
-
-
     }
-
-
 
 }
-
-// ==============================
-// SCRIPT.JS PART 3
-// PAGE SWITCH + CURRENT MONTH + CS MISTAKES REPORT
-// ==============================
 
 
 // ==============================
 // PAGE SWITCH
 // ==============================
 
-
-function showPage(page, element){
-
-
+function showPage(
+    page,
+    element
+) {
 
     const pages = [
 
-	"homePage",
+        "homePage",
         "employeePage",
         "reportPage",
         "linksPage",
@@ -1119,1095 +817,187 @@ function showPage(page, element){
     ];
 
 
-
-
-    pages.forEach(id=>{
-
+    pages.forEach(id => {
 
         const el =
-        document.getElementById(id);
+            document.getElementById(id);
 
-
-
-        if(el){
+        if (el) {
 
             el.style.display = "none";
 
         }
 
-
     });
-
-
-
-
-
 
 
     document
-    .querySelectorAll(".menu-item")
-    .forEach(item=>{
+        .querySelectorAll(".menu-item")
+        .forEach(item => {
 
+            item.classList.remove(
+                "active"
+            );
 
-        item.classList.remove(
-            "active"
-        );
-
-
-    });
-
-
-
-
-
+        });
 
 
     const target =
-    document.getElementById(
-        page + "Page"
-    );
+        document.getElementById(
+            page + "Page"
+        );
 
-
-
-    if(target){
+    if (target) {
 
         target.style.display = "block";
 
     }
 
 
-
-
-
-
-    if(page === "report"){
-
+    if (page === "report") {
 
         loadMonthFilter();
 
-
         renderAllMistakes();
-
 
     }
 
 
-
-
-
-
-    if(element){
-
+    if (element) {
 
         element.classList.add(
             "active"
         );
 
-
     }
-
-
 
 }
 
 
-
-
-
-
-
 // ==============================
-// CURRENT RUNNING MONTH
+// CURRENT MONTH
 // ==============================
 
-
-function getRunningMonth(){
-
-
+function getRunningMonth() {
 
     const now =
-    new Date();
-
-
+        new Date();
 
     return now.toLocaleString(
         "default",
         {
-
-            month:"long",
-
-            year:"numeric"
-
+            month: "long",
+            year: "numeric"
         }
     );
 
-
-
 }
 
 
-
-
-
-
-
 // ==============================
-// CS MISTAKES REPORT
+// CURRENT EMPLOYEE MISTAKES
 // ==============================
 
-
-function renderMistakes(csName){
-
-
-
-    const container =
-    document.getElementById(
-        "mistakeContainer"
-    );
-
-
-
-    if(!container) return;
-
-
-
-
-    container.innerHTML = "";
-
-
-
-
-
-
-
-    const cleanName =
-
-    String(csName || "")
-    .trim()
-    .toLowerCase();
-
-
-
-
-
-
-
-    if(!cleanName){
-
-
-
-        container.innerHTML = `
-
-        <p class="no-data">
-
-        No employee selected
-
-        </p>
-
-        `;
-
-
-        return;
-
-
-    }
-
-
-
-
-
-
-
-
-    const runningMonth =
-    getRunningMonth();
-
-
-
-
-
-
-    container.innerHTML = `
-
-
-    <div class="mistake-header">
-
-
-        <div>
-
-            <h2>
-            Showing mistakes for current month
-            </h2>
-
-
-        </div>
-
-
-
-        <div class="month-badge">
-
-            📅 ${runningMonth}
-
-        </div>
-
-
-
-    </div>
-
-
-
-    `;
-
-
-
-
-
-
-
-
-
-
-    const mistakes =
-
-    Report.filter(item=>{
-
-
-
-
-
-        const itemName =
-
-        String(
-            item["CS Name"] || ""
-        )
-        .trim()
-        .toLowerCase();
-
-
-
-
-
-
-        const date =
-
-        parseDate(
-            item["Date"]
-        );
-
-
-
-        if(!date)
-            return false;
-
-
-
-
-
-
-
-        const itemMonth =
-
-        date.toLocaleString(
-            "default",
-            {
-
-                month:"long",
-
-                year:"numeric"
-
-            }
-        );
-
-
-
-
-
-
-
-        return (
-
-            itemName === cleanName
-
-            &&
-
-            itemMonth === runningMonth
-
-        );
-
-
-
-
-    });
-
-
-
-
-
-
-
-
-
-    if(mistakes.length === 0){
-
-
-
-        container.innerHTML += `
-
-
-        <p class="no-data">
-
-        No mistakes found for ${runningMonth}
-
-        </p>
-
-
-        `;
-
-
-
-        return;
-
-
-    }
-
-
-
-
-
-
-
-
-
-
-    const badgeColor = {
-
-
-        "Wrong Information":
-        "wrong-information",
-
-
-        "Not Follow SOP":
-        "not-follow-sop",
-
-
-        "Late Reply":
-        "late-reply",
-
-
-        "No Reply":
-        "no-reply",
-
-
-        "Angry With Player":
-        "angry-player",
-
-
-        "Non Professional":
-        "non-professional",
-
-
-        "No solution":
-        "no-solution",
-
-
-        "No explanation":
-        "no-explanation",
-
-
-        "Verbal warning":
-        "verbal-warning",
-
-
-        "Warning letter":
-        "warning-letter"
-
-
-    };
-
-
-
-
-
-
-
-
-
-    container.innerHTML +=
-
-    mistakes.map(
-    (item,index)=>{
-
-
-
-
-
-
-        const date =
-
-        parseDate(
-            item["Date"]
-        );
-
-
-
-
-
-
-
-        const colorClass =
-
-        badgeColor[
-            item["Subject"]
-        ]
-
-        ||
-
-        "default";
-
-
-
-
-
-
-
-
-
-        return `
-
-
-
-        <div class="mistake-card ${colorClass}">
-
-
-
-
-
-
-
-            <div class="card-top">
-
-
-
-
-
-                <span class="subject ${colorClass}">
-
-                ${item["Subject"] || "-"}
-
-                </span>
-
-
-
-
-
-
-                <div style="
-                display:flex;
-                align-items:center;
-                gap:8px;
-                ">
-
-
-
-
-
-                    <span class="count-badge">
-
-                    ${mistakes.length}
-
-                    </span>
-
-
-
-
-
-                    <span class="count-badge">
-
-                    #${index+1}
-
-                    </span>
-
-
-
-
-
-
-                    <span class="date ${colorClass}">
-
-                    📅 ${
-                    date
-                    ?
-                    date.toLocaleDateString("en-GB")
-                    :
-                    "-"
-                    }
-
-                    </span>
-
-
-
-
-
-                </div>
-
-
-
-
-
-            </div>
-
-
-
-
-
-
-
-
-            <p class="remarks">
-
-
-            <strong>
-            REMARKS:
-            </strong>
-
-
-            <br>
-
-
-            ${item["Detailed Remark"] || "-"}
-
-
-
-            </p>
-
-
-
-
-
-
-
-
-            <hr>
-
-
-
-
-
-
-
-
-            <p class="link">
-
-
-            🔗
-
-
-
-            ${
-                item["Screenshot link"]
-
-                ?
-
-                `
-
-                <a
-                href="${item["Screenshot link"]}"
-                target="_blank">
-
-                View Screenshot
-
-                </a>
-
-
-                `
-
-                :
-
-                "No Screenshot"
-
-            }
-
-
-
-
-            </p>
-
-
-
-
-
-
-
-
-        </div>
-
-
-
-        `;
-
-
-
-
-
-
-    }
-
-    )
-    .join("");
-
-
-
-
-
-
-
-
-
-    container.innerHTML += `
-
-
-
-    <div class="end-list">
-
-
-        <hr>
-
-
-        <span>
-        ⓘ End of list
-        </span>
-
-
-        <hr>
-
-
-
-    </div>
-
-
-
-    `;
-
-
-
-}
-
-// ==============================
-// SCRIPT.JS PART 4
-// ALL MISTAKES REPORT + MONTH FILTER + PAGINATION
-// ==============================
-
-
-// ==============================
-// REPORT VARIABLES
-// ==============================
-
-
-let mistakesPerPage = 10;
-
-
-let currentMistakePage =
-Number(localStorage.getItem("mistakePage")) || 1;
-
-
-let allMistakeReports = [];
-
-
-
-
-
-
-// ==============================
-// LOAD MONTH FILTER
-// ==============================
-
-
-function loadMonthFilter(){
-
-
-
-    const select =
-    document.getElementById(
-        "monthFilter"
-    );
-
-
-
-    if(!select) return;
-
-
-
-
-
-
-    const currentValue =
-    select.value;
-
-
-
-
-
-
-    let months =
-
-    [
-
-        ...new Set(
-
-            allData.map(item=>{
-
-
-                const date =
-                parseDate(
-                    item["Date"]
-                );
-
-
-
-                if(!date)
-                    return null;
-
-
-
-
-
-                return date.toLocaleString(
-                    "en-GB",
-                    {
-
-                        month:"long",
-
-                        year:"numeric"
-
-                    }
-                );
-
-
-
-            })
-            .filter(Boolean)
-
-
-        )
-
-    ];
-
-
-
-
-
-
-    // Latest Month First
-
-    months.sort(
-        (a,b)=>{
-
-
-            return new Date(b) - new Date(a);
-
-
-        }
-
-    );
-
-
-
-
-
-
-
-
-    select.innerHTML = `
-
-
-    <option value="all">
-
-    All Months 2026
-
-    </option>
-
-
-    `;
-
-
-
-
-
-
-
-
-    months.forEach(month=>{
-
-
-        select.innerHTML += `
-
-
-        <option value="${month}">
-
-        ${month}
-
-        </option>
-
-
-        `;
-
-
-    });
-
-
-
-
-
-
-    if(currentValue){
-
-
-        select.value =
-        currentValue;
-
-
-    }
-
-
-
-}
-
-// ==============================
-// RENDER ALL MISTAKES REPORT
-// ==============================
-
-function loadCSNameFilter() {
-
-    const select =
-        document.getElementById("csNameFilter");
-
-    if (!select) return;
-
-    const currentValue = select.value;
-
-    const names = [
-        ...new Set(
-            allData
-                .map(item =>
-                    String(
-                        item["CS Name"] || ""
-                    ).trim()
-                )
-                .filter(name => name !== "")
-        )
-    ].sort((a, b) =>
-        a.localeCompare(b)
-    );
-
-    select.innerHTML = `
-        <option value="all">All CS</option>
-    `;
-
-    names.forEach(name => {
-
-        const option =
-            document.createElement("option");
-
-        option.value = name;
-        option.textContent = name;
-
-        select.appendChild(option);
-
-    });
-
-    if(
-        currentValue &&
-        names.includes(currentValue)
-    ){
-        select.value = currentValue;
-    }
-
-}
-
-
-function renderAllMistakes(
-    page = currentMistakePage
-) {
+function renderMistakes(csName) {
 
     const container =
         document.getElementById(
-            "reportMistakeContainer"
+            "mistakeContainer"
         );
 
     if (!container) return;
 
-    let mistakes = [...allData];
+    container.innerHTML = "";
 
-    const selectedMonth =
-        document.getElementById(
-            "monthFilter"
-        )?.value || "all";
-	const selectedName =
-   	 document.getElementById(
-    	    "csNameFilter"
-   	 )?.value || "all";
 
-    if (selectedMonth !== "all") {
+    const cleanName =
+        String(csName || "")
+            .trim()
+            .toLowerCase();
 
-        mistakes = mistakes.filter(item => {
 
-            const date =
-                parseDate(
-                    item["Date"]
-                );
+    if (!cleanName) {
 
-            if (!date) return false;
+        container.innerHTML = `
+            <p class="no-data">
+                No employee selected
+            </p>
+        `;
 
-            const monthYear =
-                date.toLocaleString(
-                    "en-GB",
-                    {
-                        month: "long",
-                        year: "numeric"
-                    }
-                );
-
-            return monthYear === selectedMonth;
-
-        });
-
-    }
-if (selectedName !== "all") {
-
-    mistakes = mistakes.filter(item => {
-
-        return String(
-            item["CS Name"] || ""
-        )
-        .trim()
-        .toLowerCase()
-        ===
-        selectedName
-        .trim()
-        .toLowerCase();
-
-    });
-
-}
-
-const trueCount =
-    mistakes.filter(item =>
-        getMistakeCountedStatus(item)
-    ).length;
-
-const notCounted =
-    mistakes.length - trueCount;
-
-    mistakes.sort((a, b) => {
-
-        const dateA =
-            parseDate(
-                a["Date"]
-            ) || new Date(0);
-
-        const dateB =
-            parseDate(
-                b["Date"]
-            ) || new Date(0);
-
-        if (dateB - dateA !== 0) {
-            return dateB - dateA;
-        }
-
-        return b.Row - a.Row;
-
-    });
-
-    allMistakeReports = mistakes;
-
-    const totalPages =
-        Math.ceil(
-            allMistakeReports.length /
-            mistakesPerPage
-        );
-
-    if (totalPages === 0) {
-
-        page = 1;
-
-    } else {
-
-        if (page < 1)
-            page = 1;
-
-        if (page > totalPages)
-            page = totalPages;
-
+        return;
     }
 
-    currentMistakePage = page;
 
-    localStorage.setItem(
-        "mistakePage",
-        currentMistakePage
-    );
+    const runningMonth =
+        getRunningMonth();
 
-    const start =
-        (currentMistakePage - 1) *
-        mistakesPerPage;
-
-    const end =
-        start + mistakesPerPage;
-
-    mistakes =
-        mistakes.slice(
-            start,
-            end
-        );
 
     container.innerHTML = `
 
         <div class="mistake-header">
 
             <div>
-
                 <h2>
-                    All Mistakes Reports
+                    Showing mistakes for current month
                 </h2>
-
             </div>
 
-            <div style="
-                display:flex;
-                gap:10px;
-                align-items:center;
-            ">
-
-                <div class="count-badge">
-                    📊 ${allMistakeReports.length}
-                    Reports
-                </div>
-
-                <div class="count-badge success">
-                    🔴 ${trueCount}
-                    Counted
-                </div>
-
-                <div class="count-badge danger">
-                    🟢 ${notCounted}
-                    Not Counted
-                </div>
-
+            <div class="month-badge">
+                📅 ${runningMonth}
             </div>
 
         </div>
 
     `;
 
-    container.innerHTML +=
-        renderMistakePagination();
 
-    if (!mistakes.length) {
+    const mistakes =
+        Report.filter(item => {
+
+            const itemName =
+                String(
+                    item["CS Name"] || ""
+                )
+                .trim()
+                .toLowerCase();
+
+
+            const date =
+                parseDate(
+                    item["Date"]
+                );
+
+
+            if (!date) return false;
+
+
+            const itemMonth =
+                date.toLocaleString(
+                    "default",
+                    {
+                        month: "long",
+                        year: "numeric"
+                    }
+                );
+
+
+            return (
+                itemName === cleanName &&
+                itemMonth === runningMonth
+            );
+
+        });
+
+
+    if (mistakes.length === 0) {
 
         container.innerHTML += `
 
             <p class="no-data">
-                No reports found.
+
+                No mistakes found for
+                ${runningMonth}
+
             </p>
 
         `;
@@ -2215,6 +1005,7 @@ const notCounted =
         return;
 
     }
+
 
     const badgeColor = {
 
@@ -2250,6 +1041,660 @@ const notCounted =
 
     };
 
+
+    container.innerHTML +=
+
+        mistakes.map(
+            (item, index) => {
+
+                const date =
+                    parseDate(
+                        item["Date"]
+                    );
+
+
+                const colorClass =
+                    badgeColor[
+                        item["Subject"]
+                    ] || "default";
+
+
+                return `
+
+                    <div
+                        class="
+                            mistake-card
+                            ${colorClass}
+                        "
+                    >
+
+                        <div class="card-top">
+
+                            <span
+                                class="
+                                    subject
+                                    ${colorClass}
+                                "
+                            >
+                                ${item["Subject"] || "-"}
+                            </span>
+
+
+                            <div
+                                style="
+                                    display:flex;
+                                    align-items:center;
+                                    gap:8px;
+                                "
+                            >
+
+                                <span
+                                    class="count-badge"
+                                >
+                                    ${mistakes.length}
+                                </span>
+
+
+                                <span
+                                    class="count-badge"
+                                >
+                                    #${index + 1}
+                                </span>
+
+
+                                <span
+                                    class="
+                                        date
+                                        ${colorClass}
+                                    "
+                                >
+                                    📅 ${
+                                        date
+                                            ? date.toLocaleDateString(
+                                                "en-GB"
+                                            )
+                                            : "-"
+                                    }
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <p class="remarks">
+
+                            <strong>
+                                REMARKS:
+                            </strong>
+
+                            <br>
+
+                            ${
+                                item["Detailed Remark"]
+                                || "-"
+                            }
+
+                        </p>
+
+
+                        <hr>
+
+
+                        <p class="link">
+
+                            🔗
+
+                            ${
+                                item[
+                                    "Screenshot link"
+                                ]
+
+                                ?
+
+                                `
+                                    <a
+                                        href="${
+                                            item[
+                                                "Screenshot link"
+                                            ]
+                                        }"
+                                        target="_blank"
+                                    >
+                                        View Screenshot
+                                    </a>
+                                `
+
+                                :
+
+                                "No Screenshot"
+                            }
+
+                        </p>
+
+                    </div>
+
+                `;
+
+            }
+        ).join("");
+
+
+    container.innerHTML += `
+
+        <div class="end-list">
+
+            <hr>
+
+            <span>
+                ⓘ End of list
+            </span>
+
+            <hr>
+
+        </div>
+
+    `;
+
+}
+
+
+// ==============================
+// ALL MISTAKE REPORT
+// ==============================
+
+let mistakesPerPage = 10;
+
+let currentMistakePage =
+    Number(
+        localStorage.getItem(
+            "mistakePage"
+        )
+    ) || 1;
+
+let allMistakeReports = [];
+
+
+// ==============================
+// MONTH FILTER
+// ==============================
+
+function loadMonthFilter() {
+
+    const select =
+        document.getElementById(
+            "monthFilter"
+        );
+
+    if (!select) return;
+
+
+    const currentValue =
+        select.value;
+
+
+    let months = [
+
+        ...new Set(
+
+            allData
+                .map(item => {
+
+                    const date =
+                        parseDate(
+                            item["Date"]
+                        );
+
+                    if (!date) return null;
+
+
+                    return date.toLocaleString(
+                        "en-GB",
+                        {
+                            month: "long",
+                            year: "numeric"
+                        }
+                    );
+
+                })
+                .filter(Boolean)
+
+        )
+
+    ];
+
+
+    months.sort(
+        (a, b) =>
+            new Date(b) -
+            new Date(a)
+    );
+
+
+    select.innerHTML = `
+
+        <option value="all">
+            All Months 2026
+        </option>
+
+    `;
+
+
+    months.forEach(month => {
+
+        select.innerHTML += `
+
+            <option value="${month}">
+                ${month}
+            </option>
+
+        `;
+
+    });
+
+
+    if (currentValue) {
+
+        select.value =
+            currentValue;
+
+    }
+
+}
+
+
+// ==============================
+// CS NAME FILTER
+// ==============================
+
+function loadCSNameFilter() {
+
+    const select =
+        document.getElementById(
+            "csNameFilter"
+        );
+
+    if (!select) return;
+
+
+    const currentValue =
+        select.value;
+
+
+    const names = [
+
+        ...new Set(
+
+            allData
+                .map(item =>
+                    String(
+                        item["CS Name"] || ""
+                    ).trim()
+                )
+                .filter(
+                    name => name !== ""
+                )
+
+        )
+
+    ].sort(
+        (a, b) =>
+            a.localeCompare(b)
+    );
+
+
+    select.innerHTML = `
+
+        <option value="all">
+            All CS
+        </option>
+
+    `;
+
+
+    names.forEach(name => {
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+        option.value = name;
+
+        option.textContent = name;
+
+        select.appendChild(
+            option
+        );
+
+    });
+
+
+    if (
+        currentValue &&
+        names.includes(currentValue)
+    ) {
+
+        select.value =
+            currentValue;
+
+    }
+
+}
+
+
+// ==============================
+// ALL MISTAKES
+// ==============================
+
+function renderAllMistakes(
+    page = currentMistakePage
+) {
+
+    const container =
+        document.getElementById(
+            "reportMistakeContainer"
+        );
+
+    if (!container) return;
+
+
+    let mistakes =
+        [...allData];
+
+
+    const selectedMonth =
+        document.getElementById(
+            "monthFilter"
+        )?.value || "all";
+
+
+    const selectedName =
+        document.getElementById(
+            "csNameFilter"
+        )?.value || "all";
+
+
+    if (
+        selectedMonth !== "all"
+    ) {
+
+        mistakes =
+            mistakes.filter(item => {
+
+                const date =
+                    parseDate(
+                        item["Date"]
+                    );
+
+                if (!date) return false;
+
+
+                const monthYear =
+                    date.toLocaleString(
+                        "en-GB",
+                        {
+                            month: "long",
+                            year: "numeric"
+                        }
+                    );
+
+
+                return (
+                    monthYear ===
+                    selectedMonth
+                );
+
+            });
+
+    }
+
+
+    if (
+        selectedName !== "all"
+    ) {
+
+        mistakes =
+            mistakes.filter(item => {
+
+                return (
+                    String(
+                        item["CS Name"] || ""
+                    )
+                    .trim()
+                    .toLowerCase()
+
+                    ===
+
+                    selectedName
+                        .trim()
+                        .toLowerCase()
+                );
+
+            });
+
+    }
+
+
+    const trueCount =
+        mistakes.filter(item =>
+            getMistakeCountedStatus(
+                item
+            )
+        ).length;
+
+
+    const notCounted =
+        mistakes.length -
+        trueCount;
+
+
+    mistakes.sort((a, b) => {
+
+        const dateA =
+            parseDate(
+                a["Date"]
+            ) || new Date(0);
+
+        const dateB =
+            parseDate(
+                b["Date"]
+            ) || new Date(0);
+
+
+        if (
+            dateB - dateA !== 0
+        ) {
+
+            return (
+                dateB - dateA
+            );
+
+        }
+
+
+        return (
+            Number(b.Row || 0) -
+            Number(a.Row || 0)
+        );
+
+    });
+
+
+    allMistakeReports =
+        mistakes;
+
+
+    const totalPages =
+        Math.ceil(
+            allMistakeReports.length /
+            mistakesPerPage
+        );
+
+
+    if (totalPages === 0) {
+
+        page = 1;
+
+    } else {
+
+        if (page < 1) {
+            page = 1;
+        }
+
+        if (page > totalPages) {
+            page = totalPages;
+        }
+
+    }
+
+
+    currentMistakePage =
+        page;
+
+
+    localStorage.setItem(
+        "mistakePage",
+        currentMistakePage
+    );
+
+
+    const start =
+        (
+            currentMistakePage - 1
+        ) * mistakesPerPage;
+
+
+    const end =
+        start +
+        mistakesPerPage;
+
+
+    mistakes =
+        mistakes.slice(
+            start,
+            end
+        );
+
+
+    container.innerHTML = `
+
+        <div class="mistake-header">
+
+            <div>
+
+                <h2>
+                    All Mistakes Reports
+                </h2>
+
+            </div>
+
+
+            <div
+                style="
+                    display:flex;
+                    gap:10px;
+                    align-items:center;
+                "
+            >
+
+                <div class="count-badge">
+
+                    📊
+                    ${allMistakeReports.length}
+                    Reports
+
+                </div>
+
+
+                <div
+                    class="
+                        count-badge
+                        success
+                    "
+                >
+
+                    🔴
+                    ${trueCount}
+                    Counted
+
+                </div>
+
+
+                <div
+                    class="
+                        count-badge
+                        danger
+                    "
+                >
+
+                    🟢
+                    ${notCounted}
+                    Not Counted
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    container.innerHTML +=
+        renderMistakePagination();
+
+
+    if (!mistakes.length) {
+
+        container.innerHTML += `
+
+            <p class="no-data">
+                No reports found.
+            </p>
+
+        `;
+
+        return;
+
+    }
+
+
+    const badgeColor = {
+
+        "Wrong Information":
+            "wrong-information",
+
+        "Not Follow SOP":
+            "not-follow-sop",
+
+        "Late Reply":
+            "late-reply",
+
+        "No Reply":
+            "no-reply",
+
+        "Angry With Player":
+            "angry-player",
+
+        "Non Professional":
+            "non-professional",
+
+        "No solution":
+            "no-solution",
+
+        "No explanation":
+            "no-explanation",
+
+        "Verbal warning":
+            "verbal-warning",
+
+        "Warning letter":
+            "warning-letter"
+
+    };
+
+
     const html =
         mistakes.map(item => {
 
@@ -2258,52 +1703,91 @@ const notCounted =
                     item["Date"]
                 );
 
+
             const colorClass =
                 badgeColor[
                     item["Subject"]
                 ] || "default";
 
+
             const reported =
                 String(
-                    item["Reported in file"] || ""
+                    item[
+                        "Reported in file"
+                    ] || ""
                 )
                 .trim()
                 .toUpperCase();
+
 
             const reportClass =
                 reported === "TRUE"
                     ? "reported-true"
                     : "reported-false";
 
+
             return `
 
-                <div class="mistake-card ${colorClass} ${reportClass}">
+                <div
+                    class="
+                        mistake-card
+                        ${colorClass}
+                        ${reportClass}
+                    "
+                >
 
                     <p class="cs-name">
 
                         👤
 
                         <strong>
-                            ${item["CS Name"] || "-"}
+                            ${
+                                item[
+                                    "CS Name"
+                                ] || "-"
+                            }
                         </strong>
 
                     </p>
 
+
                     <div class="card-top">
 
-                        <span class="subject ${colorClass}">
-                            ${item["Subject"] || "-"}
-                        </span>
-
-                        <span class="date ${colorClass}">
-                            📅 ${
-                                date
-                                    ? date.toLocaleDateString("en-GB")
-                                    : "-"
+                        <span
+                            class="
+                                subject
+                                ${colorClass}
+                            "
+                        >
+                            ${
+                                item[
+                                    "Subject"
+                                ] || "-"
                             }
                         </span>
 
+
+                        <span
+                            class="
+                                date
+                                ${colorClass}
+                            "
+                        >
+
+                            📅
+
+                            ${
+                                date
+                                    ? date.toLocaleDateString(
+                                        "en-GB"
+                                    )
+                                    : "-"
+                            }
+
+                        </span>
+
                     </div>
+
 
                     <p class="remarks">
 
@@ -2313,11 +1797,17 @@ const notCounted =
 
                         <br>
 
-                        ${item["Detailed Remark"] || "-"}
+                        ${
+                            item[
+                                "Detailed Remark"
+                            ] || "-"
+                        }
 
                     </p>
 
+
                     <hr>
+
 
                     <p class="remarks">
 
@@ -2328,49 +1818,82 @@ const notCounted =
                         <br>
 
                         ${
-                            item["Feedback from (TL/Senior)"]
-                            || "-"
+                            item[
+                                "Feedback from (TL/Senior)"
+                            ] || "-"
                         }
 
                     </p>
 
+
                     <hr>
+
 
                     <div class="links">
 
                         ${
                             item["Chat link"]
-                            ? `
+
+                            ?
+
+                            `
                                 <a
-                                    href="${item["Chat link"]}"
+                                    href="${
+                                        item[
+                                            "Chat link"
+                                        ]
+                                    }"
                                     target="_blank"
                                     class="chat-link"
                                 >
                                     💬 View Chat
                                 </a>
                             `
-                            : ""
+
+                            :
+
+                            ""
                         }
 
+
                         ${
-                            item["Screenshot link"]
-                            ? `
+                            item[
+                                "Screenshot link"
+                            ]
+
+                            ?
+
+                            `
                                 <a
-                                    href="${item["Screenshot link"]}"
+                                    href="${
+                                        item[
+                                            "Screenshot link"
+                                        ]
+                                    }"
                                     target="_blank"
                                     class="ss-link"
                                 >
                                     🖼 View Screenshot
                                 </a>
                             `
-                            : ""
+
+                            :
+
+                            ""
                         }
+
 
                         ${
                             !item["Chat link"] &&
                             !item["Screenshot link"]
-                            ? "No Attachment"
-                            : ""
+
+                            ?
+
+                            "No Attachment"
+
+                            :
+
+                            ""
                         }
 
                     </div>
@@ -2381,10 +1904,12 @@ const notCounted =
 
         }).join("");
 
+
     container.insertAdjacentHTML(
         "beforeend",
         html
     );
+
 
     container.insertAdjacentHTML(
         "beforeend",
@@ -2393,412 +1918,468 @@ const notCounted =
 
 }
 
+
 // ==============================
 // PAGINATION
 // ==============================
 
-
 function renderMistakePagination() {
 
-    const totalPages = Math.ceil(
-        allMistakeReports.length / mistakesPerPage
-    );
+    const totalPages =
+        Math.ceil(
+            allMistakeReports.length /
+            mistakesPerPage
+        );
+
+
+    if (totalPages <= 1) {
+
+        return "";
+
+    }
+
 
     let html = `
-    <div class="pagination">
 
-    <button
-        onclick="renderAllMistakes(${currentMistakePage - 1})"
-        ${currentMistakePage === 1 ? "disabled" : ""}>
-        ⬅ Prev
-    </button>
+        <div class="pagination">
+
+            <button
+                onclick="
+                    renderAllMistakes(
+                        ${currentMistakePage - 1}
+                    )
+                "
+                ${
+                    currentMistakePage === 1
+                        ? "disabled"
+                        : ""
+                }
+            >
+                ⬅ Prev
+            </button>
+
     `;
+
 
     const maxVisible = 7;
 
-    let start = Math.max(1, currentMistakePage - 3);
-    let end = Math.min(totalPages, currentMistakePage + 3);
 
-    if (currentMistakePage <= 4) {
-        end = Math.min(totalPages, maxVisible);
+    let start =
+        Math.max(
+            1,
+            currentMistakePage - 3
+        );
+
+
+    let end =
+        Math.min(
+            totalPages,
+            currentMistakePage + 3
+        );
+
+
+    if (
+        currentMistakePage <= 4
+    ) {
+
+        end =
+            Math.min(
+                totalPages,
+                maxVisible
+            );
+
     }
 
-    if (currentMistakePage >= totalPages - 3) {
-        start = Math.max(1, totalPages - maxVisible + 1);
+
+    if (
+        currentMistakePage >=
+        totalPages - 3
+    ) {
+
+        start =
+            Math.max(
+                1,
+                totalPages -
+                maxVisible +
+                1
+            );
+
     }
 
-    // First page
+
     if (start > 1) {
+
         html += `
-        <button onclick="renderAllMistakes(1)">1</button>
+
+            <button
+                onclick="
+                    renderAllMistakes(1)
+                "
+            >
+                1
+            </button>
+
         `;
+
 
         if (start > 2) {
-            html += `<span class="dots">...</span>`;
-        }
-    }
 
-    // Middle pages
-    for (let i = start; i <= end; i++) {
+            html += `
+                <span class="dots">
+                    ...
+                </span>
+            `;
 
-        html += `
-        <button
-            onclick="renderAllMistakes(${i})"
-            class="${i === currentMistakePage ? "active-page" : ""}">
-            ${i}
-        </button>
-        `;
-    }
-
-    // Last page
-    if (end < totalPages) {
-
-        if (end < totalPages - 1) {
-            html += `<span class="dots">...</span>`;
         }
 
-        html += `
-        <button onclick="renderAllMistakes(${totalPages})">
-            ${totalPages}
-        </button>
-        `;
     }
+
+
+    for (
+        let i = start;
+        i <= end;
+        i++
+    ) {
+
+        html += `
+
+            <button
+                onclick="
+                    renderAllMistakes(${i})
+                "
+                class="${
+                    i === currentMistakePage
+                        ? "active-page"
+                        : ""
+                }"
+            >
+                ${i}
+            </button>
+
+        `;
+
+    }
+
+
+    if (
+        end < totalPages
+    ) {
+
+        if (
+            end <
+            totalPages - 1
+        ) {
+
+            html += `
+
+                <span class="dots">
+                    ...
+                </span>
+
+            `;
+
+        }
+
+
+        html += `
+
+            <button
+                onclick="
+                    renderAllMistakes(
+                        ${totalPages}
+                    )
+                "
+            >
+                ${totalPages}
+            </button>
+
+        `;
+
+    }
+
 
     html += `
-    <button
-        onclick="renderAllMistakes(${currentMistakePage + 1})"
-        ${currentMistakePage === totalPages ? "disabled" : ""}>
-        Next ➡
-    </button>
 
-    </div>
+            <button
+                onclick="
+                    renderAllMistakes(
+                        ${currentMistakePage + 1}
+                    )
+                "
+                ${
+                    currentMistakePage ===
+                    totalPages
+                        ? "disabled"
+                        : ""
+                }
+            >
+                Next ➡
+            </button>
+
+        </div>
+
     `;
 
+
     return html;
+
 }
 
-// ==============================
-// SCRIPT.JS PART 5
-// LINKS RENDER + LOGOUT + REPORT AUTO LOAD FIX
-// ==============================
-
-
 
 // ==============================
-// LINKS RENDER
+// LINKS
 // ==============================
 
-
-function renderLinks(category, containerId){
-
+function renderLinks(
+    category,
+    containerId
+) {
 
     const container =
-    document.getElementById(containerId);
+        document.getElementById(
+            containerId
+        );
 
-
-
-    if(!container)
-        return;
-
+    if (!container) return;
 
 
     container.innerHTML = "";
 
 
-
-
     allLinks
 
-    .filter(item=>{
+        .filter(item => {
 
+            return (
 
-        return (
+                item.Category ===
+                category &&
 
-            item.Category === category
+                String(
+                    item.Active
+                ).toUpperCase() ===
+                "TRUE"
 
-            &&
+            );
 
-            String(item.Active)
-            .toUpperCase()
-            ===
-            "TRUE"
+        })
 
-        );
+        .forEach(item => {
 
+            container.innerHTML += `
 
-    })
+                <div
+                    class="
+                        link-card
+                        ${item.Color || ""}
+                    "
+                >
 
+                    <a
+                        href="${item.URL}"
+                        target="_blank"
+                    >
+                        ${
+                            item.Name ||
+                            "-"
+                        }
+                    </a>
 
-    .forEach(item=>{
+                </div>
 
+            `;
 
-
-        container.innerHTML += `
-
-
-        <div class="link-card ${item.Color || ""}">
-
-
-            <a
-
-            href="${item.URL}"
-
-            target="_blank">
-
-
-            ${item.Name || "-"}
-
-
-            </a>
-
-
-        </div>
-
-
-
-        `;
-
-
-
-    });
-
-
+        });
 
 }
-
-
-
-
-
-
 
 
 // ==============================
 // LOGOUT
 // ==============================
 
-
-function logout(){
-
-
+function logout() {
 
     const confirmLogout =
-    confirm(
-        "Are you sure you want to logout?"
-    );
+        confirm(
+            "Are you sure you want to logout?"
+        );
 
 
-
-    if(confirmLogout){
-
-
+    if (confirmLogout) {
 
         localStorage.removeItem(
             "user"
         );
 
-
-
         localStorage.removeItem(
             "loginDate"
         );
-
-
 
         window.location.replace(
             "login.html"
         );
 
-
-
     }
-
-
 
 }
 
 
-
-
-
-
-
-
 // ==============================
-// REPORT PAGE AUTO LOAD FIX
+// OPEN REPORT PAGE
 // ==============================
 
-
-function openReportPage(){
-
-
+function openReportPage() {
 
     const page =
-    document.getElementById(
-        "reportPage"
-    );
+        document.getElementById(
+            "reportPage"
+        );
 
 
-
-    if(page){
-
-
+    if (page) {
 
         page.style.display =
-        "block";
-
-
+            "block";
 
         loadMonthFilter();
 
-
-
         renderAllMistakes();
 
-
-
     }
-
-
 
 }
 
 
-
-
-
-
-
-
 // ==============================
-// MONTH FILTER CHANGE EVENT
+// REPORT FILTER EVENTS
 // ==============================
-
 
 document.addEventListener(
-"DOMContentLoaded",
-()=>{
+    "DOMContentLoaded",
+    () => {
 
-
-
-    const monthFilter =
-    document.getElementById(
-        "monthFilter"
-    );
-
-
-
-    if(monthFilter){
-
-
-
-        monthFilter.addEventListener(
-        "change",
-        ()=>{
-
-
-            currentMistakePage = 1;
-
-
-            renderAllMistakes(
-                1
+        const monthFilter =
+            document.getElementById(
+                "monthFilter"
             );
 
 
-        });
+        if (monthFilter) {
+
+            monthFilter.onchange =
+                () => {
+
+                    currentMistakePage =
+                        1;
+
+                    renderAllMistakes(1);
+
+                };
+
+        }
 
 
+        const csNameFilter =
+            document.getElementById(
+                "csNameFilter"
+            );
+
+
+        if (csNameFilter) {
+
+            csNameFilter.onchange =
+                () => {
+
+                    currentMistakePage =
+                        1;
+
+                    renderAllMistakes(1);
+
+                };
+
+        }
 
     }
-
-
-
-});
-
-
-
-
-
-
+);
 
 
 // ==============================
-// WINDOW LOAD CHECK
+// WINDOW LOAD
 // ==============================
-
 
 window.addEventListener(
-"load",
-()=>{
+    "load",
+    () => {
+
+        const reportPage =
+            document.getElementById(
+                "reportPage"
+            );
 
 
+        if (
+            reportPage &&
+            reportPage.style.display !== "none"
+        ) {
 
-    const reportPage =
-    document.getElementById(
-        "reportPage"
-    );
+            loadMonthFilter();
 
+            renderAllMistakes();
 
-
-    if(
-        reportPage &&
-        reportPage.style.display !== "none"
-    ){
-
-
-
-        loadMonthFilter();
-
-
-
-        renderAllMistakes();
-
-
+        }
 
     }
+);
 
 
-
-});
-
-// =========================================================
-// HOME - SUBJECT WISE MISTAKE REPORT
-// CURRENT MONTH + COUNTED / NOT COUNTED
-// =========================================================
+// ============================================================
+// HOME MISTAKE REPORT
+// ============================================================
 
 function renderHomeMistakeReports() {
 
     const container =
-        document.getElementById("homeMistakeSubjects");
+        document.getElementById(
+            "homeMistakeSubjects"
+        );
+
 
     const totalElement =
-        document.getElementById("homeMistakeTotal");
+        document.getElementById(
+            "homeMistakeTotal"
+        );
+
 
     const monthElement =
-        document.getElementById("homeMistakeMonth");
+        document.getElementById(
+            "homeMistakeMonth"
+        );
 
 
     if (!container) return;
 
 
-    // =====================================================
-    // CURRENT MONTH
-    // =====================================================
+    const now =
+        new Date();
 
-    const now = new Date();
 
     const currentMonth =
         now.getMonth();
+
 
     const currentYear =
         now.getFullYear();
 
 
     const monthName =
-        now.toLocaleString("en-US", {
-            month: "long",
-            year: "numeric"
-        });
+        now.toLocaleString(
+            "en-US",
+            {
+                month: "long",
+                year: "numeric"
+            }
+        );
 
 
     if (monthElement) {
@@ -2809,123 +2390,164 @@ function renderHomeMistakeReports() {
     }
 
 
-    // =====================================================
-    // FILTER CURRENT MONTH
-    // =====================================================
-
     const currentMonthMistakes =
+
         Array.isArray(allData)
-            ? allData.filter(item => {
+
+            ?
+
+            allData.filter(item => {
 
                 const date =
-                    parseDate(item["Date"]);
+                    parseDate(
+                        item["Date"]
+                    );
+
 
                 if (!date) return false;
 
+
                 return (
-                    date.getMonth() === currentMonth &&
-                    date.getFullYear() === currentYear
+
+                    date.getMonth() ===
+                    currentMonth &&
+
+                    date.getFullYear() ===
+                    currentYear
+
                 );
 
             })
-            : [];
+
+            :
+
+            [];
 
 
-    // =====================================================
-// TOTAL COUNTED MISTAKES ONLY
-    // =====================================================
-
-const totalCounted =
-    currentMonthMistakes.filter(item =>
-        getMistakeCountedStatus(item)
-    ).length;
-
-
-if (totalElement) {
-
-    totalElement.textContent =
-        totalCounted;
-
-}
+    const totalCounted =
+        currentMonthMistakes.filter(
+            item =>
+                getMistakeCountedStatus(
+                    item
+                )
+        ).length;
 
 
-    // =====================================================
-    // SUBJECT WISE COUNT
-    // =====================================================
+    if (totalElement) {
+
+        totalElement.textContent =
+            totalCounted;
+
+    }
+
 
     const subjectCounts = {};
 
 
-    currentMonthMistakes.forEach(item => {
+    currentMonthMistakes.forEach(
+        item => {
 
-        const subject =
-            String(
-                item["Subject"] || "Other"
-            ).trim();
+            const subject =
+                String(
+                    item["Subject"] ||
+                    "Other"
+                ).trim();
 
 
-        if (!subject) return;
+            if (!subject) return;
 
 
-        if (!subjectCounts[subject]) {
+            if (
+                !subjectCounts[
+                    subject
+                ]
+            ) {
 
-            subjectCounts[subject] = {
-                total: 0,
-                counted: 0,
-                notCounted: 0
-            };
+                subjectCounts[
+                    subject
+                ] = {
+
+                    total: 0,
+                    counted: 0,
+                    notCounted: 0
+
+                };
+
+            }
+
+
+            subjectCounts[
+                subject
+            ].total++;
+
+
+            const reported =
+                String(
+                    item[
+                        "Reported in file"
+                    ] || ""
+                )
+                .trim()
+                .toUpperCase();
+
+
+            if (
+                reported === "TRUE"
+            ) {
+
+                subjectCounts[
+                    subject
+                ].counted++;
+
+            } else {
+
+                subjectCounts[
+                    subject
+                ].notCounted++;
+
+            }
 
         }
+    );
 
-
-        subjectCounts[subject].total++;
-
-
-        // Reported in file
-        const reported =
-            String(
-                item["Reported in file"] || ""
-            )
-            .trim()
-            .toUpperCase();
-
-
-        if (reported === "TRUE") {
-
-            subjectCounts[subject].counted++;
-
-        } else {
-
-            subjectCounts[subject].notCounted++;
-
-        }
-
-    });
-
-
-    // =====================================================
-    // NO DATA
-    // =====================================================
 
     const subjects =
-        Object.entries(subjectCounts);
+        Object.entries(
+            subjectCounts
+        );
 
 
     if (!subjects.length) {
 
         container.innerHTML = `
 
-            <div class="home-mistake-empty">
+            <div
+                class="
+                    home-mistake-empty
+                "
+            >
 
-                <i class="fa-solid fa-circle-check"></i>
+                <i
+                    class="
+                        fa-solid
+                        fa-circle-check
+                    "
+                ></i>
+
 
                 <h3>
                     No mistakes found
                 </h3>
 
+
                 <p>
+
                     No mistake reports for
-                    <strong>${monthName}</strong>
+
+                    <strong>
+                        ${monthName}
+                    </strong>
+
                 </p>
 
             </div>
@@ -2937,19 +2559,12 @@ if (totalElement) {
     }
 
 
-    // =====================================================
-    // SORT HIGH → LOW
-    // =====================================================
-
     subjects.sort(
         (a, b) =>
-            b[1].total - a[1].total
+            b[1].total -
+            a[1].total
     );
 
-
-    // =====================================================
-    // SUBJECT COLORS
-    // =====================================================
 
     const subjectClass = {
 
@@ -2986,80 +2601,88 @@ if (totalElement) {
     };
 
 
-    // =====================================================
-    // RENDER
-    // =====================================================
-
     container.innerHTML =
+
         subjects.map(
             ([subject, data]) => {
 
                 const colorClass =
-                    subjectClass[subject]
-                    || "default";
+                    subjectClass[
+                        subject
+                    ] || "default";
 
 
                 return `
 
-                    <div class="
-                        home-mistake-card
-                        ${colorClass}
-                    ">
+                    <div
+                        class="
+                            home-mistake-card
+                            ${colorClass}
+                        "
+                    >
 
-                        <div class="
-                            home-mistake-card-top
-                        ">
+                        <div
+                            class="
+                                home-mistake-card-top
+                            "
+                        >
 
-                            <div class="
-                                home-mistake-icon
-                            ">
+                            <div
+                                class="
+                                    home-mistake-icon
+                                "
+                            >
 
-                                <i class="
-                                    fa-solid
-                                    fa-triangle-exclamation
-                                "></i>
+                                <i
+                                    class="
+                                        fa-solid
+                                        fa-triangle-exclamation
+                                    "
+                                ></i>
 
                             </div>
 
 
-                            <div class="
-                                home-mistake-count
-                            ">
-
+                            <div
+                                class="
+                                    home-mistake-count
+                                "
+                            >
                                 ${data.total}
-
                             </div>
 
                         </div>
 
 
-                        <div class="
-                            home-mistake-subject
-                        ">
-
+                        <div
+                            class="
+                                home-mistake-subject
+                            "
+                        >
                             ${subject}
-
                         </div>
 
 
-                        <div class="
-                            home-mistake-label
-                        ">
-
+                        <div
+                            class="
+                                home-mistake-label
+                            "
+                        >
                             Reports
-
                         </div>
 
 
-                        <!-- COUNTED / NOT COUNTED -->
+                        <div
+                            class="
+                                home-mistake-status
+                            "
+                        >
 
-                        <div class="
-                            home-mistake-status
-                        ">
-
-                            <div class="
-                                counted-box
-                            ">
+                            <div
+                                class="
+                                    counted-box
+                                "
+                            >
 
                                 <span>
                                     Counted
@@ -3072,9 +2695,11 @@ if (totalElement) {
                             </div>
 
 
-                            <div class="
-                                not-counted-box
-                            ">
+                            <div
+                                class="
+                                    not-counted-box
+                                "
+                            >
 
                                 <span>
                                     Not Counted
@@ -3096,64 +2721,81 @@ if (totalElement) {
         ).join("");
 
 }
-/* =========================================================
-   HOME CLOCK
-========================================================= */
+
+
+// ============================================================
+// HOME CLOCK
+// ============================================================
 
 function updateHomeClock() {
 
-    const now = new Date();
+    const now =
+        new Date();
 
-    const timeElement = document.getElementById("homeTime");
-    const dateElement = document.getElementById("homeDate");
+
+    const timeElement =
+        document.getElementById(
+            "homeTime"
+        );
+
+
+    const dateElement =
+        document.getElementById(
+            "homeDate"
+        );
+
 
     if (timeElement) {
 
         timeElement.textContent =
-            now.toLocaleTimeString("en-GB");
+            now.toLocaleTimeString(
+                "en-GB"
+            );
 
     }
+
 
     if (dateElement) {
 
         dateElement.textContent =
-            now.toLocaleDateString("en-GB", {
-
-                day: "2-digit",
-                month: "short",
-                year: "numeric"
-
-            });
+            now.toLocaleDateString(
+                "en-GB",
+                {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric"
+                }
+            );
 
     }
 
 }
 
 
-/* Start Clock */
-
 updateHomeClock();
 
-setInterval(updateHomeClock, 1000);
+setInterval(
+    updateHomeClock,
+    1000
+);
 
 
-/* =========================================================
-   HOME STATISTICS
-========================================================= */
+// ============================================================
+// HOME STATS
+// ============================================================
 
 function updateHomeStats() {
 
-    /* -----------------------------------------
-       Total CS
-    ----------------------------------------- */
-
     const totalCS =
-        document.getElementById("homeTotalCS");
+        document.getElementById(
+            "homeTotalCS"
+        );
 
 
     if (
         totalCS &&
-        typeof employees !== "undefined"
+        typeof employees !==
+            "undefined"
     ) {
 
         totalCS.textContent =
@@ -3164,62 +2806,72 @@ function updateHomeStats() {
     }
 
 
-    /* -----------------------------------------
-       Total Mistakes
-       Current Month Only
-    ----------------------------------------- */
-
     const mistakes =
-        document.getElementById("homeMistakes");
+        document.getElementById(
+            "homeMistakes"
+        );
 
 
     if (
         mistakes &&
-        typeof allData !== "undefined"
+        typeof allData !==
+            "undefined"
     ) {
 
-        const now = new Date();
+        const now =
+            new Date();
+
 
         const currentMonth =
             now.getMonth();
+
 
         const currentYear =
             now.getFullYear();
 
 
         const currentMonthMistakes =
+
             Array.isArray(allData)
 
-                ? allData.filter(item => {
+                ?
+
+                allData.filter(item => {
 
                     const date =
-                        typeof parseDate === "function"
-                            ? parseDate(item["Date"])
-                            : null;
+                        typeof parseDate ===
+                        "function"
+
+                            ?
+
+                            parseDate(
+                                item["Date"]
+                            )
+
+                            :
+
+                            null;
 
 
-                    if (!date) {
+                    if (!date)
                         return false;
-                    }
 
 
                     return (
 
-                        date.getMonth()
-                        ===
-                        currentMonth
+                        date.getMonth() ===
+                        currentMonth &&
 
-                        &&
-
-                        date.getFullYear()
-                        ===
+                        date.getFullYear() ===
                         currentYear
 
                     );
 
                 })
 
-                : [];
+                :
+
+                [];
 
 
         mistakes.textContent =
@@ -3228,12 +2880,9 @@ function updateHomeStats() {
     }
 
 
-    /* -----------------------------------------
-       Subject-wise Home Mistake Report
-    ----------------------------------------- */
-
     if (
-        typeof allData !== "undefined" &&
+        typeof allData !==
+            "undefined" &&
         Array.isArray(allData)
     ) {
 
@@ -3251,15 +2900,10 @@ function updateHomeStats() {
 }
 
 
-/* Initial Home Stats */
-
 setTimeout(
     updateHomeStats,
     1500
 );
-
-
-/* Refresh every 5 seconds */
 
 setInterval(
     updateHomeStats,
@@ -3267,12 +2911,12 @@ setInterval(
 );
 
 
-/* =========================================================
-   S10 PORTAL
-   MISTAKE PERFORMANCE SUMMARY
-========================================================= */
+// ============================================================
+// MISTAKE PERFORMANCE SUMMARY
+// ============================================================
 
 const mistakeMonthNames = [
+
     "January",
     "February",
     "March",
@@ -3285,52 +2929,58 @@ const mistakeMonthNames = [
     "October",
     "November",
     "December"
+
 ];
 
 
-/* =========================================================
-   DATE PARSER
-========================================================= */
+// ==============================
+// SUMMARY DATE PARSER
+// ==============================
 
-/* =========================================================
-   MISTAKE SUMMARY DATE PARSER
-   Supports MM/DD/YYYY + YYYY/MM/DD + Date
-========================================================= */
-
-function parseMistakeSummaryDate(value) {
+function parseMistakeSummaryDate(
+    value
+) {
 
     if (!value) return null;
 
 
-    // ==============================
-    // JavaScript Date
-    // ==============================
-
     if (value instanceof Date) {
 
-        return isNaN(value.getTime())
+        return isNaN(
+            value.getTime()
+        )
+
             ? null
+
             : value;
 
     }
 
 
-    // ==============================
-    // Excel / Google Sheet Serial
-    // ==============================
+    if (
+        typeof value ===
+        "number"
+    ) {
 
-    if (typeof value === "number") {
+        const date =
+            new Date(
+                Math.round(
+                    (
+                        value -
+                        25569
+                    ) *
+                    86400 *
+                    1000
+                )
+            );
 
-        const date = new Date(
-            Math.round(
-                (value - 25569) *
-                86400 *
-                1000
-            )
-        );
 
-        return isNaN(date.getTime())
+        return isNaN(
+            date.getTime()
+        )
+
             ? null
+
             : date;
 
     }
@@ -3340,14 +2990,10 @@ function parseMistakeSummaryDate(value) {
         String(value).trim();
 
 
-    // ==============================
-    // MM/DD/YYYY
-    // Example: 8/22/2026
-    // ==============================
-
-    let match = text.match(
-        /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/
-    );
+    let match =
+        text.match(
+            /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/
+        );
 
 
     if (match) {
@@ -3362,37 +3008,25 @@ function parseMistakeSummaryDate(value) {
             Number(match[3]);
 
 
-        /*
-           If second > 12,
-           it MUST be MM/DD/YYYY
-
-           Example:
-           8/22/2026
-        */
-
-        if (second > 12) {
+        if (first > 12) {
 
             const date =
                 new Date(
                     year,
-                    first - 1,
-                    second
+                    second - 1,
+                    first
                 );
 
-            return isNaN(date.getTime())
+            return isNaN(
+                date.getTime()
+            )
+
                 ? null
+
                 : date;
 
         }
 
-
-        /*
-           Your Sheet format:
-           MM/DD/YYYY
-
-           Example:
-           8/13/2026
-        */
 
         const date =
             new Date(
@@ -3401,20 +3035,22 @@ function parseMistakeSummaryDate(value) {
                 second
             );
 
-        return isNaN(date.getTime())
+
+        return isNaN(
+            date.getTime()
+        )
+
             ? null
+
             : date;
 
     }
 
 
-    // ==============================
-    // YYYY/MM/DD
-    // ==============================
-
-    match = text.match(
-        /^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/
-    );
+    match =
+        text.match(
+            /^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/
+        );
 
 
     if (match) {
@@ -3437,179 +3073,264 @@ function parseMistakeSummaryDate(value) {
             );
 
 
-        return isNaN(date.getTime())
+        return isNaN(
+            date.getTime()
+        )
+
             ? null
+
             : date;
 
     }
 
 
-    // ==============================
-    // Normal Date fallback
-    // ==============================
-
     const parsed =
         new Date(text);
 
 
-    return isNaN(parsed.getTime())
+    return isNaN(
+        parsed.getTime()
+    )
+
         ? null
+
         : parsed;
 
 }
 
 
-/* =========================================================
-   GET SUBJECT
-========================================================= */
+// ==============================
+// SUBJECT
+// ==============================
 
 function getMistakeSubject(item) {
 
-    if (!item) return "Unknown";
+    if (!item) {
+        return "Unknown";
+    }
+
 
     return String(
+
         item.Subject ||
+
         item.subject ||
+
         item.Mistake ||
+
         item.mistake ||
+
         item["Mistake Type"] ||
+
         item["Subject"] ||
+
         "Unknown"
+
     ).trim();
+
 }
 
 
-/* =========================================================
-   GET COUNTED STATUS
-========================================================= */
+// ==============================
+// COUNTED STATUS
+// ==============================
 
-/* =========================================================
-   GET COUNTED STATUS
-   FIXED VERSION
-========================================================= */
-
-function getMistakeCountedStatus(item) {
+function getMistakeCountedStatus(
+    item
+) {
 
     if (!item) return false;
 
-    const value = String(
-        item["Reported in file"] ??
-        item.Reported ??
-        item.reported ??
-        item.Counted ??
-        item.counted ??
-        item.Status ??
-        item.status ??
-        ""
-    )
-    .trim()
-    .toLowerCase();
+
+    const value =
+        String(
+
+            item[
+                "Reported in file"
+            ] ??
+
+            item.Reported ??
+
+            item.reported ??
+
+            item.Counted ??
+
+            item.counted ??
+
+            item.Status ??
+
+            item.status ??
+
+            ""
+
+        )
+        .trim()
+        .toLowerCase();
+
 
     return [
+
         "true",
         "yes",
         "counted",
         "reported",
         "1"
+
     ].includes(value);
+
 }
 
 
-/* =========================================================
-   RATING
-========================================================= */
+// ==============================
+// RATING
+// ==============================
 
-function getMistakeRating(count) {
+function getMistakeRating(
+    count
+) {
 
     if (count === 0) {
 
         return {
-            text: "No Mistakes",
-            icon: "fa-circle-check",
-            className: "excellent"
+
+            text:
+                "No Mistakes",
+
+            icon:
+                "fa-circle-check",
+
+            className:
+                "excellent"
+
         };
 
     }
+
 
     if (count <= 20) {
 
         return {
-            text: "Very Good",
-            icon: "fa-star",
-            className: "very-good"
+
+            text:
+                "Very Good",
+
+            icon:
+                "fa-star",
+
+            className:
+                "very-good"
+
         };
 
     }
+
 
     if (count <= 40) {
 
         return {
-            text: "Good",
-            icon: "fa-thumbs-up",
-            className: "good"
+
+            text:
+                "Good",
+
+            icon:
+                "fa-thumbs-up",
+
+            className:
+                "good"
+
         };
 
     }
+
 
     if (count <= 60) {
 
         return {
-            text: "Average",
-            icon: "fa-face-meh",
-            className: "average"
+
+            text:
+                "Average",
+
+            icon:
+                "fa-face-meh",
+
+            className:
+                "average"
+
         };
 
     }
+
 
     if (count <= 80) {
 
         return {
-            text: "Poor",
-            icon: "fa-face-frown",
-            className: "poor"
+
+            text:
+                "Poor",
+
+            icon:
+                "fa-face-frown",
+
+            className:
+                "poor"
+
         };
 
     }
 
+
     return {
 
-        text: "Very Poor",
-        icon: "fa-triangle-exclamation",
-        className: "very-poor"
+        text:
+            "Very Poor",
+
+        icon:
+            "fa-triangle-exclamation",
+
+        className:
+            "very-poor"
 
     };
 
 }
 
-/* =========================================================
-   GET MISTAKE DATA
-========================================================= */
+
+// ==============================
+// SUMMARY DATA
+// ==============================
 
 function getMistakeSummaryData() {
 
-    /*
-       তোমার existing variable:
-       allData / Report
-
-       দুটোই check করবে।
-    */
-
     let data = [];
 
-    if (Array.isArray(allData)) {
-        data = allData;
-    }
-    else if (Array.isArray(Report)) {
-        data = Report;
+
+    if (
+        Array.isArray(allData)
+    ) {
+
+        data =
+            allData;
+
     }
 
+    else if (
+        Array.isArray(Report)
+    ) {
+
+        data =
+            Report;
+
+    }
+
+
     return data;
+
 }
 
 
-/* =========================================================
-   MONTHLY SUMMARY
-========================================================= */
+// ==============================
+// PERFORMANCE SUMMARY
+// ==============================
 
 function renderMistakePerformanceSummary() {
 
@@ -3617,6 +3338,7 @@ function renderMistakePerformanceSummary() {
         document.getElementById(
             "mistakeMonthlyGrid"
         );
+
 
     if (!grid) return;
 
@@ -3626,6 +3348,7 @@ function renderMistakePerformanceSummary() {
             "mistakeYearFilter"
         );
 
+
     const monthFilter =
         document.getElementById(
             "mistakeMonthFilter"
@@ -3633,27 +3356,32 @@ function renderMistakePerformanceSummary() {
 
 
     const selectedYear =
-        Number(yearFilter?.value || 2026);
+        Number(
+            yearFilter?.value ||
+            2026
+        );
+
 
     const selectedMonth =
-        monthFilter?.value ?? "all";
+        monthFilter?.value ??
+        "all";
 
 
     const data =
         getMistakeSummaryData();
 
 
-    /*
-       12 months initialize
-    */
-
     const monthlyData =
         mistakeMonthNames.map(
-            (month, index) => ({
+            (
+                month,
+                index
+            ) => ({
 
                 month,
 
-                monthIndex: index,
+                monthIndex:
+                    index,
 
                 total: 0,
 
@@ -3666,10 +3394,6 @@ function renderMistakePerformanceSummary() {
             })
         );
 
-
-    /*
-       Process data
-    */
 
     data.forEach(item => {
 
@@ -3688,7 +3412,9 @@ function renderMistakePerformanceSummary() {
             date.getFullYear() !==
             selectedYear
         ) {
+
             return;
+
         }
 
 
@@ -3696,15 +3422,16 @@ function renderMistakePerformanceSummary() {
             date.getMonth();
 
 
-        /*
-           Month filter
-        */
-
         if (
-            selectedMonth !== "all" &&
-            month !== Number(selectedMonth)
+            selectedMonth !==
+            "all" &&
+
+            month !==
+            Number(selectedMonth)
         ) {
+
             return;
+
         }
 
 
@@ -3715,137 +3442,212 @@ function renderMistakePerformanceSummary() {
         monthData.total++;
 
 
- const isCounted =
-    getMistakeCountedStatus(item);
+        const isCounted =
+            getMistakeCountedStatus(
+                item
+            );
 
-if (isCounted) {
 
-    monthData.counted++;
+        if (isCounted) {
 
-} else {
+            monthData.counted++;
 
-    monthData.notCounted++;
+        } else {
 
-}
+            monthData.notCounted++;
+
+        }
 
 
         const subject =
-            getMistakeSubject(item);
+            getMistakeSubject(
+                item
+            );
 
 
-        monthData.subjects[subject] =
-            (monthData.subjects[subject] || 0) + 1;
+        monthData.subjects[
+            subject
+        ] =
+
+            (
+                monthData.subjects[
+                    subject
+                ] || 0
+            ) + 1;
 
     });
 
 
-    /*
-       Render selected month OR all months
-    */
-
     let displayMonths;
 
 
-    if (selectedMonth === "all") {
+    if (
+        selectedMonth ===
+        "all"
+    ) {
 
         displayMonths =
             monthlyData;
 
     }
+
     else {
 
-        displayMonths =
-            [
-                monthlyData[
-                    Number(selectedMonth)
-                ]
-            ];
+        displayMonths = [
+
+            monthlyData[
+                Number(selectedMonth)
+            ]
+
+        ];
+
     }
 
 
-    /*
-       Monthly cards
-    */
-
     grid.innerHTML =
-        displayMonths.map(month => {
 
-            const rating =
-                getMistakeRating(
-                    month.counted
-                );
+        displayMonths.map(
+            month => {
+
+                const rating =
+                    getMistakeRating(
+                        month.counted
+                    );
 
 
-            return `
-                <div class="
-                    month-performance-card
-                    ${rating.className}
-                    ${month.total === 0 ? "empty" : ""}
-                ">
+                return `
 
-                    <div class="month-performance-top">
+                    <div
+                        class="
+                            month-performance-card
+                            ${rating.className}
+                            ${
+                                month.total === 0
+                                    ? "empty"
+                                    : ""
+                            }
+                        "
+                    >
 
-                        <span class="month-name">
-                            ${month.month}
-                        </span>
+                        <div
+                            class="
+                                month-performance-top
+                            "
+                        >
 
-                        <span class="month-number">
-                            ${String(
-                                month.monthIndex + 1
-                            ).padStart(2, "0")}
-                        </span>
+                            <span
+                                class="month-name"
+                            >
+                                ${month.month}
+                            </span>
+
+
+                            <span
+                                class="month-number"
+                            >
+                                ${
+                                    String(
+                                        month.monthIndex + 1
+                                    ).padStart(
+                                        2,
+                                        "0"
+                                    )
+                                }
+                            </span>
+
+                        </div>
+
+
+                        <div
+                            class="
+                                month-mistake-count
+                            "
+                        >
+                            ${month.total}
+                        </div>
+
+
+                        <div
+                            class="
+                                month-mistake-label
+                            "
+                        >
+                            Total Mistakes
+                        </div>
+
+
+                        <div
+                            class="
+                                month-status-row
+                            "
+                        >
+
+                            <div
+                                class="
+                                    month-counted
+                                "
+                            >
+
+                                <span>
+                                    Counted
+                                </span>
+
+                                <strong>
+                                    ${month.counted}
+                                </strong>
+
+                            </div>
+
+
+                            <div
+                                class="
+                                    month-not-counted
+                                "
+                            >
+
+                                <span>
+                                    Not Counted
+                                </span>
+
+                                <strong>
+                                    ${month.notCounted}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="
+                                month-rating
+                            "
+                        >
+
+                            <i
+                                class="
+                                    fa-solid
+                                    ${rating.icon}
+                                "
+                            ></i>
+
+                            ${rating.text}
+
+                        </div>
 
                     </div>
 
+                `;
 
-                    <div class="month-mistake-count">
-                        ${month.total}
-                    </div>
+            }
+        ).join("");
 
-                    <div class="month-mistake-label">
-                        Total Mistakes
-                    </div>
-<div class="month-status-row">
-
-    <div class="month-counted">
-        <span>Counted</span>
-        <strong>${month.counted}</strong>
-    </div>
-
-    <div class="month-not-counted">
-        <span>Not Counted</span>
-        <strong>${month.notCounted}</strong>
-    </div>
-
-</div>
-
-                    <div class="month-rating">
-
-                        <i class="fa-solid ${rating.icon}"></i>
-
-                        ${rating.text}
-
-                    </div>
-
-                </div>
-            `;
-
-        }).join("");
-
-
-    /*
-       Update statistics
-    */
 
     updateMistakeSummaryStats(
         monthlyData,
         selectedMonth
     );
 
-
-    /*
-       Update status
-    */
 
     const status =
         document.getElementById(
@@ -3856,9 +3658,16 @@ if (isCounted) {
     if (status) {
 
         status.textContent =
+
             selectedMonth === "all"
-                ? `${selectedYear} • All Months`
-                : `${mistakeMonthNames[
+
+                ?
+
+                `${selectedYear} • All Months`
+
+                :
+
+                `${mistakeMonthNames[
                     Number(selectedMonth)
                 ]} ${selectedYear}`;
 
@@ -3867,9 +3676,9 @@ if (isCounted) {
 }
 
 
-/* =========================================================
-   UPDATE SUMMARY STATISTICS
-========================================================= */
+// ==============================
+// SUMMARY STATS
+// ==============================
 
 function updateMistakeSummaryStats(
     monthlyData,
@@ -3879,7 +3688,10 @@ function updateMistakeSummaryStats(
     let selectedData;
 
 
-    if (selectedMonth === "all") {
+    if (
+        selectedMonth ===
+        "all"
+    ) {
 
         selectedData = {
 
@@ -3894,35 +3706,48 @@ function updateMistakeSummaryStats(
         };
 
 
-        monthlyData.forEach(month => {
+        monthlyData.forEach(
+            month => {
 
-            selectedData.total +=
-                month.total;
+                selectedData.total +=
+                    month.total;
 
-            selectedData.counted +=
-                month.counted;
+                selectedData.counted +=
+                    month.counted;
 
-            selectedData.notCounted +=
-                month.notCounted;
+                selectedData.notCounted +=
+                    month.notCounted;
 
 
-            Object.entries(
-                month.subjects
-            ).forEach(
-                ([subject, count]) => {
+                Object.entries(
+                    month.subjects
+                ).forEach(
+                    (
+                        [
+                            subject,
+                            count
+                        ]
+                    ) => {
 
-                    selectedData.subjects[subject] =
-                        (
-                            selectedData.subjects[subject] ||
-                            0
-                        ) + count;
+                        selectedData.subjects[
+                            subject
+                        ] =
 
-                }
-            );
+                            (
+                                selectedData
+                                    .subjects[
+                                        subject
+                                    ] || 0
+                            ) + count;
 
-        });
+                    }
+                );
+
+            }
+        );
 
     }
+
     else {
 
         selectedData =
@@ -3933,19 +3758,17 @@ function updateMistakeSummaryStats(
     }
 
 
-    /*
-       Total
-    */
-
     const total =
         document.getElementById(
             "summaryTotal"
         );
 
+
     const counted =
         document.getElementById(
             "summaryCounted"
         );
+
 
     const notCounted =
         document.getElementById(
@@ -3954,26 +3777,28 @@ function updateMistakeSummaryStats(
 
 
     if (total) {
+
         total.textContent =
             selectedData.total;
+
     }
 
 
     if (counted) {
+
         counted.textContent =
             selectedData.counted;
+
     }
 
 
     if (notCounted) {
+
         notCounted.textContent =
             selectedData.notCounted;
+
     }
 
-
-    /*
-       Rating
-    */
 
     const rating =
         document.getElementById(
@@ -3988,19 +3813,17 @@ function updateMistakeSummaryStats(
                 selectedData.counted
             );
 
+
         rating.textContent =
             result.text;
 
     }
 
 
-    /*
-       Worst / Best Month
-    */
-
-    let activeMonths =
+    const activeMonths =
         monthlyData.filter(
-            month => month.total > 0
+            month =>
+                month.total > 0
         );
 
 
@@ -4009,28 +3832,31 @@ function updateMistakeSummaryStats(
             "worstMonth"
         );
 
+
     const bestMonth =
         document.getElementById(
             "bestMonth"
         );
 
 
-    if (activeMonths.length) {
+    if (
+        activeMonths.length
+    ) {
 
         const worst =
-            [...activeMonths]
-                .sort(
-                    (a,b) =>
-                        b.total - a.total
-                )[0];
+            [...activeMonths].sort(
+                (a, b) =>
+                    b.total -
+                    a.total
+            )[0];
 
 
         const best =
-            [...activeMonths]
-                .sort(
-                    (a,b) =>
-                        a.total - b.total
-                )[0];
+            [...activeMonths].sort(
+                (a, b) =>
+                    a.total -
+                    b.total
+            )[0];
 
 
         if (worstMonth) {
@@ -4049,20 +3875,26 @@ function updateMistakeSummaryStats(
         }
 
     }
+
     else {
 
-        if (worstMonth)
-            worstMonth.textContent = "-";
+        if (worstMonth) {
 
-        if (bestMonth)
-            bestMonth.textContent = "-";
+            worstMonth.textContent =
+                "-";
+
+        }
+
+
+        if (bestMonth) {
+
+            bestMonth.textContent =
+                "-";
+
+        }
 
     }
 
-
-    /*
-       Most common mistake
-    */
 
     const topMistake =
         document.getElementById(
@@ -4079,7 +3911,9 @@ function updateMistakeSummaryStats(
     if (subjects.length) {
 
         subjects.sort(
-            (a,b) => b[1] - a[1]
+            (a, b) =>
+                b[1] -
+                a[1]
         );
 
 
@@ -4091,19 +3925,24 @@ function updateMistakeSummaryStats(
         }
 
     }
+
     else {
 
-        if (topMistake)
-            topMistake.textContent = "-";
+        if (topMistake) {
+
+            topMistake.textContent =
+                "-";
+
+        }
 
     }
 
 }
 
 
-/* =========================================================
-   FILTER EVENTS
-========================================================= */
+// ==============================
+// PERFORMANCE SUMMARY INIT
+// ==============================
 
 function initMistakePerformanceSummary() {
 
@@ -4111,6 +3950,7 @@ function initMistakePerformanceSummary() {
         document.getElementById(
             "mistakeYearFilter"
         );
+
 
     const monthFilter =
         document.getElementById(
@@ -4120,20 +3960,16 @@ function initMistakePerformanceSummary() {
 
     if (yearFilter) {
 
-        yearFilter.addEventListener(
-            "change",
-            renderMistakePerformanceSummary
-        );
+        yearFilter.onchange =
+            renderMistakePerformanceSummary;
 
     }
 
 
     if (monthFilter) {
 
-        monthFilter.addEventListener(
-            "change",
-            renderMistakePerformanceSummary
-        );
+        monthFilter.onchange =
+            renderMistakePerformanceSummary;
 
     }
 
@@ -4142,10 +3978,6 @@ function initMistakePerformanceSummary() {
 
 }
 
-
-/* =========================================================
-   AUTO INIT
-========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -4156,87 +3988,387 @@ document.addEventListener(
     }
 );
 
-/* =========================================================
-   MISTAKE OVERVIEW
-   CS + YEAR + MONTH FILTER
-   GRAPH
-========================================================= */
 
-let mistakeOverviewChart = null;
+// ============================================================
+// MISTAKE OVERVIEW
+// ============================================================
 
 
-/* =========================================================
-   LOAD CS FILTER
-========================================================= */
+// ==============================
+// OVERVIEW CS FILTER
+// ==============================
 
 function loadOverviewCSFilter() {
 
     const select =
-        document.getElementById("overviewCSFilter");
+        document.getElementById(
+            "overviewCSFilter"
+        );
+
 
     if (!select) return;
 
-    if (!Array.isArray(allData) || allData.length === 0) {
+
+    if (
+        !Array.isArray(allData) ||
+        allData.length === 0
+    ) {
+
         return;
+
     }
 
-    const currentValue = select.value || "all";
+
+    const currentValue =
+        select.value ||
+        "all";
+
 
     const names = [
+
         ...new Set(
+
             allData
                 .map(item =>
                     String(
-                        item["CS Name"] || ""
+                        item["CS Name"] ||
+                        ""
                     ).trim()
                 )
-                .filter(name => name !== "")
+                .filter(
+                    name =>
+                        name !== ""
+                )
+
         )
-    ].sort((a, b) =>
-        a.localeCompare(b)
+
+    ].sort(
+        (a, b) =>
+            a.localeCompare(b)
     );
 
 
     select.innerHTML = `
+
         <option value="all">
             All CS
         </option>
+
     `;
 
 
     names.forEach(name => {
 
         const option =
-            document.createElement("option");
+            document.createElement(
+                "option"
+            );
 
-        option.value = name;
 
-        option.textContent = name;
+        option.value =
+            name;
 
-        select.appendChild(option);
+
+        option.textContent =
+            name;
+
+
+        select.appendChild(
+            option
+        );
 
     });
 
 
     if (
         currentValue !== "all" &&
-        names.includes(currentValue)
+        names.includes(
+            currentValue
+        )
     ) {
 
-        select.value = currentValue;
+        select.value =
+            currentValue;
 
     }
 
 }
 
 
-/* =========================================================
-   GET OVERVIEW DATA
-========================================================= */
+// ============================================================
+// IMPORTANT NEW YEAR / SECTION FILTER
+// ============================================================
+
+
+// ==============================
+// OVERVIEW YEAR FILTER
+// ==============================
+
+function loadOverviewYearFilter() {
+
+    const select =
+        document.getElementById(
+            "overviewYearFilter"
+        );
+
+
+    if (!select) return;
+
+
+    const currentValue =
+        select.value ||
+        "2026-full";
+
+
+    select.innerHTML = `
+
+        <option value="2026-full">
+            2026 Full Year
+        </option>
+
+        <option value="2026-1st">
+            2026 1st Section
+        </option>
+
+        <option value="2026-2nd">
+            2026 2nd Section
+        </option>
+
+    `;
+
+
+    if (
+
+        currentValue ===
+            "2026-full" ||
+
+        currentValue ===
+            "2026-1st" ||
+
+        currentValue ===
+            "2026-2nd"
+
+    ) {
+
+        select.value =
+            currentValue;
+
+    }
+
+    else {
+
+        select.value =
+            "2026-full";
+
+    }
+
+}
+
+
+// ==============================
+// GET SELECTED YEAR SECTION
+// ==============================
+
+function getOverviewYearSection() {
+
+    const value =
+        document.getElementById(
+            "overviewYearFilter"
+        )?.value ||
+        "2026-full";
+
+
+    // ==============================
+    // 1ST SECTION
+    // January - June
+    // ==============================
+
+    if (
+        value ===
+        "2026-1st"
+    ) {
+
+        return {
+
+            value,
+
+            year: 2026,
+
+            startMonth: 0,
+
+            endMonth: 5,
+
+            label:
+                "2026 1st Section"
+
+        };
+
+    }
+
+
+    // ==============================
+    // 2ND SECTION
+    // July - December
+    // ==============================
+
+    if (
+        value ===
+        "2026-2nd"
+    ) {
+
+        return {
+
+            value,
+
+            year: 2026,
+
+            startMonth: 6,
+
+            endMonth: 11,
+
+            label:
+                "2026 2nd Section"
+
+        };
+
+    }
+
+
+    // ==============================
+    // FULL YEAR
+    // January - December
+    // ==============================
+
+    return {
+
+        value:
+            "2026-full",
+
+        year: 2026,
+
+        startMonth: 0,
+
+        endMonth: 11,
+
+        label:
+            "2026 Full Year"
+
+    };
+
+}
+
+
+// ==============================
+// OVERVIEW MONTH FILTER
+// ==============================
+
+function loadOverviewMonthFilter() {
+
+    const select =
+        document.getElementById(
+            "overviewMonthFilter"
+        );
+
+
+    if (!select) return;
+
+
+    const section =
+        getOverviewYearSection();
+
+
+    const currentValue =
+        select.value ||
+        "all";
+
+
+    select.innerHTML = `
+
+        <option value="all">
+            All Months
+        </option>
+
+    `;
+
+
+    for (
+
+        let i =
+            section.startMonth;
+
+        i <=
+            section.endMonth;
+
+        i++
+
+    ) {
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+
+        option.value =
+            String(i);
+
+
+        option.textContent =
+            mistakeMonthNames[i];
+
+
+        select.appendChild(
+            option
+        );
+
+    }
+
+
+    const currentNumber =
+        Number(currentValue);
+
+
+    if (
+
+        currentValue !==
+            "all" &&
+
+        Number.isInteger(
+            currentNumber
+        ) &&
+
+        currentNumber >=
+            section.startMonth &&
+
+        currentNumber <=
+            section.endMonth
+
+    ) {
+
+        select.value =
+            currentValue;
+
+    }
+
+    else {
+
+        select.value =
+            "all";
+
+    }
+
+}
+
+
+// ==============================
+// GET OVERVIEW MISTAKES
+// ==============================
 
 function getOverviewMistakes() {
 
-    if (!Array.isArray(allData)) {
+    if (
+        !Array.isArray(allData)
+    ) {
 
         return [];
 
@@ -4246,93 +4378,137 @@ function getOverviewMistakes() {
     const csFilter =
         document.getElementById(
             "overviewCSFilter"
-        )?.value || "all";
-
-
-    const yearFilter =
-        document.getElementById(
-            "overviewYearFilter"
-        )?.value || "2026";
+        )?.value ||
+        "all";
 
 
     const monthFilter =
         document.getElementById(
             "overviewMonthFilter"
-        )?.value || "all";
+        )?.value ||
+        "all";
 
 
-    return allData.filter(item => {
-
-        const date =
-            parseMistakeSummaryDate(
-                item["Date"]
-            );
+    const section =
+        getOverviewYearSection();
 
 
-        if (!date) return false;
+    return allData.filter(
+        item => {
+
+            const date =
+                parseMistakeSummaryDate(
+                    item["Date"]
+                );
 
 
-        /* YEAR */
+            if (!date) {
 
-        if (
-            date.getFullYear() !==
-            Number(yearFilter)
-        ) {
+                return false;
 
-            return false;
-
-        }
+            }
 
 
-        /* MONTH */
-
-        if (
-            monthFilter !== "all" &&
-            date.getMonth() !==
-            Number(monthFilter)
-        ) {
-
-            return false;
-
-        }
-
-
-        /* CS */
-
-        if (csFilter !== "all") {
-
-            const itemCS =
-                String(
-                    item["CS Name"] || ""
-                )
-                .trim()
-                .toLowerCase();
-
+            // ==============================
+            // YEAR
+            // ==============================
 
             if (
-                itemCS !==
-                csFilter
-                    .trim()
-                    .toLowerCase()
+                date.getFullYear() !==
+                section.year
             ) {
 
                 return false;
 
             }
 
+
+            // ==============================
+            // SECTION
+            // ==============================
+
+            if (
+
+                date.getMonth() <
+                    section.startMonth ||
+
+                date.getMonth() >
+                    section.endMonth
+
+            ) {
+
+                return false;
+
+            }
+
+
+            // ==============================
+            // MONTH
+            // ==============================
+
+            if (
+                monthFilter !==
+                "all"
+            ) {
+
+                if (
+                    date.getMonth() !==
+                    Number(
+                        monthFilter
+                    )
+                ) {
+
+                    return false;
+
+                }
+
+            }
+
+
+            // ==============================
+            // CS
+            // ==============================
+
+            if (
+                csFilter !==
+                "all"
+            ) {
+
+                const itemCS =
+                    String(
+                        item[
+                            "CS Name"
+                        ] || ""
+                    )
+                    .trim()
+                    .toLowerCase();
+
+
+                if (
+                    itemCS !==
+                    csFilter
+                        .trim()
+                        .toLowerCase()
+                ) {
+
+                    return false;
+
+                }
+
+            }
+
+
+            return true;
+
         }
-
-
-        return true;
-
-    });
+    );
 
 }
 
 
-/* =========================================================
-   RENDER MISTAKE OVERVIEW
-========================================================= */
+// ==============================
+// RENDER OVERVIEW
+// ==============================
 
 function renderMistakeOverview() {
 
@@ -4340,22 +4516,22 @@ function renderMistakeOverview() {
         getOverviewMistakes();
 
 
-    /* =====================================================
-       BASIC STATS
-    ===================================================== */
-
     const total =
         data.length;
 
 
     const counted =
-        data.filter(item =>
-            getMistakeCountedStatus(item)
+        data.filter(
+            item =>
+                getMistakeCountedStatus(
+                    item
+                )
         ).length;
 
 
     const notCounted =
-        total - counted;
+        total -
+        counted;
 
 
     const totalElement =
@@ -4409,14 +4585,12 @@ function renderMistakeOverview() {
     if (ratingElement) {
 
         ratingElement.textContent =
-            getMistakeRating(counted).text;
+            getMistakeRating(
+                counted
+            ).text;
 
     }
 
-
-    /* =====================================================
-       STATUS
-    ===================================================== */
 
     const status =
         document.getElementById(
@@ -4427,25 +4601,32 @@ function renderMistakeOverview() {
     const cs =
         document.getElementById(
             "overviewCSFilter"
-        )?.value || "all";
-
-
-    const year =
-        document.getElementById(
-            "overviewYearFilter"
-        )?.value || "2026";
+        )?.value ||
+        "all";
 
 
     const month =
         document.getElementById(
             "overviewMonthFilter"
-        )?.value || "all";
+        )?.value ||
+        "all";
+
+
+    const section =
+        getOverviewYearSection();
 
 
     const monthText =
+
         month === "all"
-            ? "All Months"
-            : mistakeMonthNames[
+
+            ?
+
+            "All Months"
+
+            :
+
+            mistakeMonthNames[
                 Number(month)
             ];
 
@@ -4453,27 +4634,45 @@ function renderMistakeOverview() {
     if (status) {
 
         status.textContent =
-            `${cs === "all" ? "All CS" : cs} • ${year} • ${monthText}`;
+
+            `${
+                cs === "all"
+                    ? "All CS"
+                    : cs
+            } • ${
+                section.label
+            } • ${
+                monthText
+            }`;
 
     }
 
 
-    /* =====================================================
-       GRAPH
-    ===================================================== */
+    // ==============================
+    // CHART
+    // ==============================
 
     renderMistakeOverviewChart(
         data,
         cs,
         month
     );
-renderMistakeSubjectBreakdown(data);
+
+
+    // ==============================
+    // SUBJECT BREAKDOWN
+    // ==============================
+
+    renderMistakeSubjectBreakdown(
+        data
+    );
+
 }
 
 
-/* =========================================================
-   GRAPH DATA
-========================================================= */
+// ==============================
+// OVERVIEW CHART
+// ==============================
 
 function renderMistakeOverviewChart(
     data,
@@ -4491,16 +4690,19 @@ function renderMistakeOverviewChart(
 
 
     const ctx =
-        canvas.getContext("2d");
+        canvas.getContext(
+            "2d"
+        );
 
 
-    /* Destroy old chart */
-
-    if (mistakeOverviewChart) {
+    if (
+        mistakeOverviewChart
+    ) {
 
         mistakeOverviewChart.destroy();
 
-        mistakeOverviewChart = null;
+        mistakeOverviewChart =
+            null;
 
     }
 
@@ -4514,214 +4716,307 @@ function renderMistakeOverviewChart(
     let notCountedData = [];
 
 
-    /* =====================================================
-       INDIVIDUAL CS
-    ===================================================== */
+    // ========================================================
+    // SELECTED CS
+    // ========================================================
 
-    if (selectedCS !== "all") {
+    if (
+        selectedCS !==
+        "all"
+    ) {
 
 
-        if (selectedMonth === "all") {
+        // ====================================================
+        // SELECTED CS + ALL MONTHS
+        // ====================================================
 
-            /*
-               Individual CS
-               Month-wise graph
-            */
+        if (
+            selectedMonth ===
+            "all"
+        ) {
+
+            const section =
+                getOverviewYearSection();
+
+
+            const overviewMonths =
+                mistakeMonthNames.slice(
+                    section.startMonth,
+                    section.endMonth + 1
+                );
+
 
             labels =
-                mistakeMonthNames;
+                overviewMonths;
 
 
             totalData =
-                mistakeMonthNames.map(
-                    (_, monthIndex) =>
+                overviewMonths.map(
+                    (
+                        _,
+                        index
+                    ) => {
 
-                        data.filter(item => {
+                        const monthIndex =
+                            section.startMonth +
+                            index;
 
-                            const date =
-                                parseMistakeSummaryDate(
-                                    item["Date"]
+
+                        return data.filter(
+                            item => {
+
+                                const date =
+                                    parseMistakeSummaryDate(
+                                        item["Date"]
+                                    );
+
+
+                                return (
+
+                                    date &&
+
+                                    date.getMonth() ===
+                                    monthIndex
+
                                 );
 
-                            return (
-                                date &&
-                                date.getMonth()
-                                ===
-                                monthIndex
-                            );
+                            }
+                        ).length;
 
-                        }).length
-
+                    }
                 );
 
 
             countedData =
-                mistakeMonthNames.map(
-                    (_, monthIndex) =>
+                overviewMonths.map(
+                    (
+                        _,
+                        index
+                    ) => {
 
-                        data.filter(item => {
+                        const monthIndex =
+                            section.startMonth +
+                            index;
 
-                            const date =
-                                parseMistakeSummaryDate(
-                                    item["Date"]
+
+                        return data.filter(
+                            item => {
+
+                                const date =
+                                    parseMistakeSummaryDate(
+                                        item["Date"]
+                                    );
+
+
+                                return (
+
+                                    date &&
+
+                                    date.getMonth() ===
+                                    monthIndex &&
+
+                                    getMistakeCountedStatus(
+                                        item
+                                    )
+
                                 );
 
-                            return (
-                                date &&
-                                date.getMonth()
-                                ===
-                                monthIndex
-                                &&
-                                getMistakeCountedStatus(
-                                    item
-                                )
-                            );
+                            }
+                        ).length;
 
-                        }).length
-
+                    }
                 );
 
 
             notCountedData =
                 totalData.map(
-                    (value, index) =>
+                    (
+                        value,
+                        index
+                    ) =>
+
                         value -
                         countedData[index]
+
                 );
 
-
         }
-        else {
 
-            /*
-               Individual CS
-               Subject-wise graph
-            */
+
+        // ====================================================
+        // SELECTED CS + SELECTED MONTH
+        // ====================================================
+
+        else {
 
             const subjects = {};
 
 
-            data.forEach(item => {
+            data.forEach(
+                item => {
 
-                const subject =
-                    getMistakeSubject(item);
+                    const subject =
+                        getMistakeSubject(
+                            item
+                        );
 
 
-                subjects[subject] =
-                    (
-                        subjects[subject] || 0
-                    ) + 1;
+                    subjects[
+                        subject
+                    ] =
 
-            });
+                        (
+                            subjects[
+                                subject
+                            ] || 0
+                        ) + 1;
+
+                }
+            );
+
+
+            const sorted =
+                Object.entries(
+                    subjects
+                ).sort(
+                    (a, b) =>
+                        b[1] -
+                        a[1]
+                );
 
 
             labels =
-                Object.keys(subjects);
+                sorted.map(
+                    item =>
+                        item[0]
+                );
 
 
             totalData =
-                labels.map(
-                    subject =>
-                        subjects[subject]
+                sorted.map(
+                    item =>
+                        item[1]
                 );
 
 
             countedData =
-                labels.map(subject =>
+                labels.map(
+                    subject =>
 
-                    data.filter(item =>
+                        data.filter(
+                            item =>
 
-                        getMistakeSubject(item)
-                        ===
-                        subject
-                        &&
-                        getMistakeCountedStatus(
-                            item
-                        )
+                                getMistakeSubject(
+                                    item
+                                ) ===
+                                subject &&
 
-                    ).length
+                                getMistakeCountedStatus(
+                                    item
+                                )
+                        ).length
 
                 );
 
 
             notCountedData =
                 totalData.map(
-                    (value, index) =>
+                    (
+                        value,
+                        index
+                    ) =>
+
                         value -
                         countedData[index]
+
                 );
 
         }
 
-
     }
 
-    /* =====================================================
-       ALL CS
-    ===================================================== */
+
+    // ========================================================
+    // ALL CS
+    // ========================================================
 
     else {
 
 
-        /*
-           All CS + All Months
-           → CS-wise graph
-        */
+        // ====================================================
+        // ALL CS + ALL MONTHS
+        // ====================================================
 
-        if (selectedMonth === "all") {
-
+        if (
+            selectedMonth ===
+            "all"
+        ) {
 
             const csData = {};
 
 
-            data.forEach(item => {
+            data.forEach(
+                item => {
 
-                const name =
-                    String(
-                        item["CS Name"] ||
-                        "Unknown"
-                    ).trim();
+                    const name =
+                        String(
+                            item[
+                                "CS Name"
+                            ] ||
+                            "Unknown"
+                        ).trim();
 
 
-                if (!csData[name]) {
+                    if (
+                        !csData[name]
+                    ) {
 
-                    csData[name] = {
+                        csData[name] = {
 
-                        total: 0,
+                            total: 0,
 
-                        counted: 0,
+                            counted: 0,
 
-                        notCounted: 0
+                            notCounted: 0
 
-                    };
+                        };
+
+                    }
+
+
+                    csData[
+                        name
+                    ].total++;
+
+
+                    if (
+                        getMistakeCountedStatus(
+                            item
+                        )
+                    ) {
+
+                        csData[
+                            name
+                        ].counted++;
+
+                    }
+
+                    else {
+
+                        csData[
+                            name
+                        ].notCounted++;
+
+                    }
 
                 }
-
-
-                csData[name].total++;
-
-
-                if (
-                    getMistakeCountedStatus(
-                        item
-                    )
-                ) {
-
-                    csData[name].counted++;
-
-                }
-                else {
-
-                    csData[name].notCounted++;
-
-                }
-
-            });
+            );
 
 
             const sorted =
-                Object.entries(csData)
-                .sort(
+                Object.entries(
+                    csData
+                ).sort(
                     (a, b) =>
                         b[1].total -
                         a[1].total
@@ -4730,97 +5025,120 @@ function renderMistakeOverviewChart(
 
             labels =
                 sorted.map(
-                    item => item[0]
+                    item =>
+                        item[0]
                 );
 
 
             totalData =
                 sorted.map(
-                    item => item[1].total
+                    item =>
+                        item[1].total
                 );
 
 
             countedData =
                 sorted.map(
-                    item => item[1].counted
+                    item =>
+                        item[1].counted
                 );
 
 
             notCountedData =
                 sorted.map(
-                    item => item[1].notCounted
+                    item =>
+                        item[1].notCounted
                 );
 
         }
 
+
+        // ====================================================
+        // ALL CS + SELECTED MONTH
+        // ====================================================
+
         else {
-
-
-            /*
-               All CS + Selected Month
-               → Subject-wise graph
-            */
 
             const subjects = {};
 
 
-            data.forEach(item => {
+            data.forEach(
+                item => {
 
-                const subject =
-                    getMistakeSubject(item);
+                    const subject =
+                        getMistakeSubject(
+                            item
+                        );
 
 
-                subjects[subject] =
-                    (
-                        subjects[subject] || 0
-                    ) + 1;
+                    subjects[
+                        subject
+                    ] =
 
-            });
+                        (
+                            subjects[
+                                subject
+                            ] || 0
+                        ) + 1;
+
+                }
+            );
 
 
             const sorted =
-                Object.entries(subjects)
-                .sort(
+                Object.entries(
+                    subjects
+                ).sort(
                     (a, b) =>
-                        b[1] - a[1]
+                        b[1] -
+                        a[1]
                 );
 
 
             labels =
                 sorted.map(
-                    item => item[0]
+                    item =>
+                        item[0]
                 );
 
 
             totalData =
                 sorted.map(
-                    item => item[1]
+                    item =>
+                        item[1]
                 );
 
 
             countedData =
-                labels.map(subject =>
+                labels.map(
+                    subject =>
 
-                    data.filter(item =>
+                        data.filter(
+                            item =>
 
-                        getMistakeSubject(item)
-                        ===
-                        subject
-                        &&
-                        getMistakeCountedStatus(
-                            item
-                        )
+                                getMistakeSubject(
+                                    item
+                                ) ===
+                                subject &&
 
-                    ).length
+                                getMistakeCountedStatus(
+                                    item
+                                )
+                        ).length
 
                 );
 
 
             notCountedData =
                 totalData.map(
-                    (value, index) =>
+                    (
+                        value,
+                        index
+                    ) =>
+
                         value -
                         countedData[index]
+
                 );
 
         }
@@ -4828,12 +5146,13 @@ function renderMistakeOverviewChart(
     }
 
 
-    /* =====================================================
-       CHART.JS
-    ===================================================== */
+    // ==============================
+    // CHART.JS CHECK
+    // ==============================
 
     if (
-        typeof Chart === "undefined"
+        typeof Chart ===
+        "undefined"
     ) {
 
         console.error(
@@ -4845,21 +5164,23 @@ function renderMistakeOverviewChart(
     }
 
 
+    // ==============================
+    // CREATE CHART
+    // ==============================
+
     mistakeOverviewChart =
+
         new Chart(
             ctx,
             {
 
-                type:
-                    selectedMonth === "all" &&
-                    selectedCS === "all"
-                        ? "bar"
-                        : "bar",
+                type: "bar",
 
 
                 data: {
 
                     labels: labels,
+
 
                     datasets: [
 
@@ -4871,9 +5192,11 @@ function renderMistakeOverviewChart(
                             data:
                                 totalData,
 
-                            borderWidth: 1
+                            borderWidth:
+                                1
 
                         },
+
 
                         {
 
@@ -4883,9 +5206,11 @@ function renderMistakeOverviewChart(
                             data:
                                 countedData,
 
-                            borderWidth: 1
+                            borderWidth:
+                                1
 
                         },
+
 
                         {
 
@@ -4895,7 +5220,8 @@ function renderMistakeOverviewChart(
                             data:
                                 notCountedData,
 
-                            borderWidth: 1
+                            borderWidth:
+                                1
 
                         }
 
@@ -4906,37 +5232,47 @@ function renderMistakeOverviewChart(
 
                 options: {
 
-                    responsive: true,
+                    responsive:
+                        true,
 
-                    maintainAspectRatio: false,
+                    maintainAspectRatio:
+                        false,
+
 
                     interaction: {
 
-                        mode: "index",
+                        mode:
+                            "index",
 
-                        intersect: false
+                        intersect:
+                            false
 
                     },
+
 
                     plugins: {
 
                         legend: {
 
-                            display: true
+                            display:
+                                true
 
                         }
 
                     },
 
+
                     scales: {
 
                         y: {
 
-                            beginAtZero: true,
+                            beginAtZero:
+                                true,
 
                             ticks: {
 
-                                precision: 0
+                                precision:
+                                    0
 
                             }
 
@@ -4953,13 +5289,17 @@ function renderMistakeOverviewChart(
 }
 
 
-/* =========================================================
-   INITIALIZE OVERVIEW
-========================================================= */
+// ==============================
+// OVERVIEW INIT
+// ==============================
 
 function initMistakeOverview() {
 
     loadOverviewCSFilter();
+
+    loadOverviewYearFilter();
+
+    loadOverviewMonthFilter();
 
 
     const csFilter =
@@ -4980,32 +5320,58 @@ function initMistakeOverview() {
         );
 
 
+    // ==============================
+    // CS CHANGE
+    // ==============================
+
     if (csFilter) {
 
-        csFilter.addEventListener(
-            "change",
-            renderMistakeOverview
-        );
+        csFilter.onchange =
+            () => {
+
+                renderMistakeOverview();
+
+            };
 
     }
 
+
+    // ==============================
+    // YEAR / SECTION CHANGE
+    // ==============================
 
     if (yearFilter) {
 
-        yearFilter.addEventListener(
-            "change",
-            renderMistakeOverview
-        );
+        yearFilter.onchange =
+            () => {
+
+                /*
+                 * Important:
+                 * When the section changes,
+                 * the Month dropdown is rebuilt.
+                 */
+
+                loadOverviewMonthFilter();
+
+                renderMistakeOverview();
+
+            };
 
     }
 
 
+    // ==============================
+    // MONTH CHANGE
+    // ==============================
+
     if (monthFilter) {
 
-        monthFilter.addEventListener(
-            "change",
-            renderMistakeOverview
-        );
+        monthFilter.onchange =
+            () => {
+
+                renderMistakeOverview();
+
+            };
 
     }
 
@@ -5015,9 +5381,9 @@ function initMistakeOverview() {
 }
 
 
-/* =========================================================
-   AUTO INIT
-========================================================= */
+// ==============================
+// INIT OVERVIEW
+// ==============================
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -5031,26 +5397,39 @@ document.addEventListener(
     }
 );
 
-/* =========================================================
-   SUBJECT WISE BREAKDOWN
-========================================================= */
 
-function renderMistakeSubjectBreakdown(data) {
+// ============================================================
+// SUBJECT BREAKDOWN
+// ============================================================
+
+function renderMistakeSubjectBreakdown(
+    data
+) {
 
     const container =
         document.getElementById(
             "mistakeSubjectBreakdown"
         );
 
+
     if (!container) return;
 
 
-    if (!Array.isArray(data) || !data.length) {
+    if (
+        !Array.isArray(data) ||
+        !data.length
+    ) {
 
         container.innerHTML = `
-            <div class="subject-breakdown-empty">
+
+            <div
+                class="
+                    subject-breakdown-empty
+                "
+            >
                 No mistake data available
             </div>
+
         `;
 
         return;
@@ -5061,94 +5440,131 @@ function renderMistakeSubjectBreakdown(data) {
     const subjects = {};
 
 
-    /* =========================
-       COUNT SUBJECTS
-    ========================= */
+    data.forEach(
+        item => {
 
-    data.forEach(item => {
+            const subject =
+                getMistakeSubject(
+                    item
+                );
 
-        const subject =
-            getMistakeSubject(item);
+
+            if (
+                !subjects[subject]
+            ) {
+
+                subjects[
+                    subject
+                ] = {
+
+                    total: 0,
+
+                    counted: 0,
+
+                    notCounted: 0
+
+                };
+
+            }
 
 
-        if (!subjects[subject]) {
+            subjects[
+                subject
+            ].total++;
 
-            subjects[subject] = {
 
-                total: 0,
+            if (
+                getMistakeCountedStatus(
+                    item
+                )
+            ) {
 
-                counted: 0,
+                subjects[
+                    subject
+                ].counted++;
 
-                notCounted: 0
+            }
 
-            };
+            else {
+
+                subjects[
+                    subject
+                ].notCounted++;
+
+            }
 
         }
+    );
 
-
-        subjects[subject].total++;
-
-
-        if (
-            getMistakeCountedStatus(item)
-        ) {
-
-            subjects[subject].counted++;
-
-        }
-        else {
-
-            subjects[subject].notCounted++;
-
-        }
-
-    });
-
-
-    /* =========================
-       SORT HIGH → LOW
-    ========================= */
 
     const sorted =
-        Object.entries(subjects)
-        .sort(
+        Object.entries(
+            subjects
+        ).sort(
             (a, b) =>
                 b[1].total -
                 a[1].total
         );
 
 
-    /* =========================
-       RENDER
-    ========================= */
-
     container.innerHTML =
+
         sorted.map(
-            ([subject, value]) => {
+            (
+                [
+                    subject,
+                    value
+                ]
+            ) => {
 
                 const percentage =
+
                     value.total > 0
-                        ? Math.round(
+
+                        ?
+
+                        Math.round(
                             (
                                 value.counted /
                                 value.total
-                            ) * 100
+                            ) *
+                            100
                         )
-                        : 0;
+
+                        :
+
+                        0;
 
 
                 return `
 
-                    <div class="subject-breakdown-card">
+                    <div
+                        class="
+                            subject-breakdown-card
+                        "
+                    >
 
-                        <div class="subject-breakdown-top">
 
-                            <div class="subject-breakdown-name">
+                        <div
+                            class="
+                                subject-breakdown-top
+                            "
+                        >
 
-                                <i class="
-                                    fa-solid
-                                    fa-triangle-exclamation
-                                "></i>
+
+                            <div
+                                class="
+                                    subject-breakdown-name
+                                "
+                            >
+
+                                <i
+                                    class="
+                                        fa-solid
+                                        fa-triangle-exclamation
+                                    "
+                                ></i>
+
 
                                 <span>
                                     ${subject}
@@ -5156,17 +5572,25 @@ function renderMistakeSubjectBreakdown(data) {
 
                             </div>
 
+
                             <strong>
                                 ${value.total}
                             </strong>
 
+
                         </div>
 
 
-                        <div class="subject-breakdown-bar">
+                        <div
+                            class="
+                                subject-breakdown-bar
+                            "
+                        >
 
                             <div
-                                class="subject-breakdown-progress"
+                                class="
+                                    subject-breakdown-progress
+                                "
                                 style="
                                     width:${percentage}%;
                                 "
@@ -5175,30 +5599,41 @@ function renderMistakeSubjectBreakdown(data) {
                         </div>
 
 
-                        <div class="subject-breakdown-status">
+                        <div
+                            class="
+                                subject-breakdown-status
+                            "
+                        >
 
                             <span>
+
                                 Counted:
+
                                 <strong>
                                     ${value.counted}
                                 </strong>
+
                             </span>
 
+
                             <span>
+
                                 Not Counted:
+
                                 <strong>
                                     ${value.notCounted}
                                 </strong>
+
                             </span>
 
                         </div>
+
 
                     </div>
 
                 `;
 
             }
-        )
-        .join("");
+        ).join("");
 
 }
