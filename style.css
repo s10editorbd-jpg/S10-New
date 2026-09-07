@@ -4144,7 +4144,49 @@ background:#dcfce7;
 
     height:100% !important;
 }
+/* ================= Refresh Button ================= */
 
+#refreshBtn {
+    border: none;
+    outline: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    background: #16469d;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+#refreshBtn:hover {
+    background: #0f3578;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+}
+
+#refreshBtn:active {
+    transform: scale(0.97);
+}
+
+/* Loading State */
+#refreshBtn.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    #refreshBtn {
+        padding: 9px 14px;
+        font-size: 13px;
+    }
+}
 
 /* =========================================================
    RESPONSIVE
